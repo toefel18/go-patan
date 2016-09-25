@@ -42,13 +42,13 @@ type Store interface {
 	StartStopwatch() Stopwatch
 
 	// Finds a duration and returns (true, duration distribution) if found else (false, distribution with all fields set to 0)
-	FindDuration(key string) (bool, Distribution)
+	FindDuration(key string) (Distribution, bool)
 
 	// Finds a counter and returns (true, counter value) if found, else (false, 0)
-	FindCounter(key string) (bool, int64)
+	FindCounter(key string) (int64, bool)
 
 	// Finds a sample and returns (true, sample distribution) if found else (false, distribution with all fields set to 0)
-	FindSample(key string) (bool, Distribution)
+	FindSample(key string) (Distribution, bool)
 
 	// Records the elapsed time of the stopwatch and adds that to the distribution identified by key.
 	// Returns the recorded millis
