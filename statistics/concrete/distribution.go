@@ -1,44 +1,73 @@
 package concrete
 
-import "math"
+import (
+	"math"
+)
 
 type Distribution struct {
-    SampleCount        int64   `json:"sampleCount"`
-    Minimum            int64   `json:"minimum"`
-    Maximum            int64   `json:"maximum"`
-    SampleAverage      float64 `json:"sampleAverage"`
-    SampleVariance     float64 `json:"sampleVariance"`
-    SampleStdDeviation float64 `json:"sampleStdDeviation"`
-}
-
-func (dist *Distribution) GetSampleCount() int64 {
-    return dist.SampleCount
-}
-
-func (dist *Distribution) GetMinimum() int64 {
-    return dist.Minimum
-}
-
-func (dist *Distribution) GetMaximum() int64 {
-    return dist.Maximum
-}
-
-func (dist *Distribution) GetSampleAverage() float64 {
-    return dist.SampleAverage
-}
-
-func (dist *Distribution) GetSampleVariance() float64 {
-    return dist.SampleVariance
-}
-
-func (dist *Distribution) GetSampleStdDeviation() float64 {
-    return dist.SampleStdDeviation
-}
-
-func (dist *Distribution) addSample(value int64) {
-
+	sampleCount int64
+	min         int64
+	max         int64
+	avg         float64
+	variance    float64
+	stdDev      float64
 }
 
 func NewDistribution() *Distribution {
-    return &Distribution{Minimum: math.MinInt64,Maximum: math.MaxInt64}
+	return &Distribution{min: math.MaxInt64, max: math.MinInt64}
+}
+
+func (dist *Distribution) SampleCount() int64 {
+	return dist.sampleCount
+}
+
+func (dist *Distribution) Min() int64 {
+	return dist.min
+}
+
+func (dist *Distribution) Max() int64 {
+	return dist.max
+}
+
+func (dist *Distribution) Avg() float64 {
+	return dist.avg
+}
+
+func (dist *Distribution) Variance() float64 {
+	return dist.variance
+}
+
+func (dist *Distribution) StdDev() float64 {
+	return dist.stdDev
+}
+
+func (dist *Distribution) addSample(value int64) {
+	updatedSampleCount := dist.sampleCount + 1
+	updatedMin := min(value, dist.min)
+	updatedMax := max(value, dist.max)
+	updatedAvg := dist.avg + ((float64(value) - dist.avg) / float64(updatedSampleCount))
+	updatedVar := dist.variance + ((float64(value) - dist.avg) * (float64(value) - updatedAvg))
+	updatedStdDev := math.Sqrt(updatedVar / float64(dist.sampleCount))
+	dist.sampleCount = updatedSampleCount
+	dist.min = updatedMin
+	dist.max = updatedMax
+	dist.avg = updatedAvg
+	dist.variance = updatedVar
+	dist.stdDev = updatedStdDev
+}
+
+func min(a, b int64) int64 {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func max(a, b int64) int64 {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
 }

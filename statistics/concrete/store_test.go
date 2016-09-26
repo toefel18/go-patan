@@ -17,11 +17,11 @@
  */
 package concrete
 
-import (
-	"testing"
-)
-
-func TestNewStore(t *testing.T) {
-	// implement this test
-	NewStore()
-}
+//import (
+//	"testing"
+//)
+//
+//func TestNewStore(t *testing.T) {
+//	// implement this test
+//	NewStore()
+//}

@@ -22,13 +22,14 @@ type Stopwatch interface {
 	ElapsedNanos() int64
 }
 
+// Models a sampling distribution
 type Distribution interface {
-	GetSampleCount() int64
-	GetMinimum() int64
-	GetMaximum() int64
-	GetSampleAverage() float64
-	GetSampleVariance() float64
-	GetSampleStdDeviation() float64
+	SampleCount() int64
+	Min() int64
+	Max() int64
+	Avg() float64
+	Variance() float64
+	StdDev() float64
 }
 
 type Snapshot interface {
