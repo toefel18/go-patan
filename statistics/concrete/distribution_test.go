@@ -1,13 +1,13 @@
 package concrete
 
 import (
-	"github.com/toefel18/go-patan/statistics"
 	"math"
 	"testing"
+	"github.com/toefel18/go-patan/statistics/api"
 )
 
 func TestNewDistribution(t *testing.T) {
-	var dist statistics.Distribution
+	var dist *Distribution
 	dist = NewDistribution()
 	assertDistributionHasValues(dist, 0, math.MaxInt64, math.MinInt64, 0.0, 0.0, 0.0, t)
 }
@@ -22,7 +22,7 @@ func TestAddSample(t *testing.T) {
 	assertDistributionHasValues(dist, 3, 0, 20, 10.0, 50.0, 10.0, t)
 }
 
-func assertDistributionHasValues(dist statistics.Distribution, sampleCount, min, max int64, avg, variance, stdDev float64, t *testing.T) {
+func assertDistributionHasValues(dist *Distribution, sampleCount, min, max int64, avg, variance, stdDev float64, t *testing.T) {
 	if dist.SampleCount() != sampleCount {
 		t.Errorf("expected sample count to be %v but was %v", sampleCount, dist.SampleCount())
 	}
@@ -40,6 +40,15 @@ func assertDistributionHasValues(dist statistics.Distribution, sampleCount, min,
 	}
 	if !(math.IsNaN(stdDev) && math.IsNaN(dist.StdDev())) && !floatEquals(stdDev, dist.StdDev()) {
 		t.Errorf("expected sample std dev to be %v but was %v", stdDev, dist.StdDev())
+	}
+}
+
+func TestDistributionImplementsInterface(t *testing.T) {
+	var apiDist api.Distribution
+	var concreteDist *Distribution = NewDistribution()
+	apiDist = concreteDist
+	if apiDist.SampleCount() != 0 {
+		t.Error("concrete.Distribution has problems implementing api.Distribution interface")
 	}
 }
 

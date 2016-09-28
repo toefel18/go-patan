@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package statistics
+package api
 
 type Stopwatch interface {
 	ElapsedMillis() int64
@@ -33,22 +33,22 @@ type Distribution interface {
 }
 
 type Snapshot interface {
-	GetTimestampTaken() int64
-	GetDurations() map[string]Distribution
-	GetCounters() map[string]int64
-	GetSamples() map[string]Distribution
+	TimestampTaken() int64
+	Durations() map[string]Distribution
+	Counters() map[string]int64
+	Samples() map[string]Distribution
 }
 
 type Facade interface {
 	StartStopwatch() Stopwatch
 
-	// Finds a duration and returns (true, duration distribution) if found else (false, distribution with all fields set to 0)
+	// Finds a duration and returns (duration-distribution, true) if found else (distribution with all fields set to 0, false)
 	FindDuration(key string) (Distribution, bool)
 
-	// Finds a counter and returns (true, counter value) if found, else (false, 0)
+	// Finds a counter and returns (counter value, true) if found, else (0, false)
 	FindCounter(key string) (int64, bool)
 
-	// Finds a sample and returns (true, sample distribution) if found else (false, distribution with all fields set to 0)
+	// Finds a sample and returns (sample-distribution, true) if found else (distribution with all fields set to 0, false)
 	FindSample(key string) (Distribution, bool)
 
 	// Records the elapsed time of the stopwatch and adds that to the distribution identified by key.

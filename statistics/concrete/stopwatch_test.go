@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"testing"
 	"time"
+	"github.com/toefel18/go-patan/statistics/api"
 )
 
 func TestStartStopwatch(t *testing.T) {
@@ -44,4 +45,12 @@ func TestStartStopwatch(t *testing.T) {
 		t.Errorf("stopwatch elapsed %v nanos, expected to be in range 100000000 - 105000000", elapsedNanos)
 	}
 	fmt.Println(elapsedMillis, elapsedNanos)
+}
+
+func TestStopwatchImplementsApiInterface(t *testing.T) {
+	var concreteSw *Stopwatch = startNewStopwatch()
+	var apiSw api.Stopwatch = concreteSw
+	if apiSw.ElapsedMillis() > 100 {
+		t.Error("concrete.Stopwatch has problems implementing api.Stopwatch")
+	}
 }

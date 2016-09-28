@@ -19,9 +19,31 @@ package concrete
 
 import (
 	"testing"
+	"github.com/toefel18/go-patan/statistics/api"
 )
 
-func TestNewStore(t *testing.T) {
-	// implement this test
-	NewStore()
+func TestNewFacade(t *testing.T) {
+	testStore := NewStore()
+	facade := NewFacade(testStore)
+	if facade == nil {
+		t.Error("NewFacade returned nil")
+	}
+}
+
+func TestNewFacadeWithNilStore(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("NewFacade should panic when store=nil, but no panic")
+		}
+	}()
+
+	NewFacade(nil)
+}
+
+func TestFacadeImplementsApiInterface(t *testing.T) {
+	var concreteFacade *Facade = NewFacade(NewStore())
+	var apiFacade api.Facade = concreteFacade
+	if apiFacade.StartStopwatch() == nil {
+		t.Error("concrete.Facade has problems implementing the api.Facade")
+	}
 }

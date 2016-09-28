@@ -5,12 +5,12 @@ import (
 )
 
 type Distribution struct {
-	sampleCount int64
-	min         int64
-	max         int64
-	avg         float64
-	variance    float64
-	stdDev      float64
+	sampleCount int64   `json:"sampleCount"`
+	min         int64   `json:"minimum"`
+	max         int64   `json:"maximum"`
+	avg         float64 `json:"sampleAverage"`
+	variance    float64 `json:"sampleVariance"`
+	stdDev      float64 `json:"sampleStdDeviation"`
 }
 
 func NewDistribution() *Distribution {

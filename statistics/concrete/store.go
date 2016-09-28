@@ -1,7 +1,5 @@
 package concrete
 
-import "github.com/toefel18/go-patan/statistics"
-
 type StatStore struct {
     durations map[string]*Distribution
     counters  map[string]int64

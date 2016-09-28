@@ -1,26 +1,26 @@
 package concrete
 
-import "github.com/toefel18/go-patan/statistics"
+import "github.com/toefel18/go-patan/statistics/api"
 
 type StatsSnapshot struct {
-	TimestampTaken int64
-	Durations      map[string]statistics.Distribution `json:"durations"`
-	Counters       map[string]int64                   `json:"counters"`
-	Samples        map[string]statistics.Distribution `json:"samples"`
+	TimestampCreated  int64                       `json:"timestampTaken"`
+	DurationsSnapshot map[string]api.Distribution `json:"durations"`
+	CountersSnapshot  map[string]int64            `json:"counters"`
+	SamplesSnapshot   map[string]api.Distribution `json:"samples"`
 }
 
-func (sh *StatsSnapshot) GetTimestampTaken() int64 {
-	return sh.TimestampTaken
+func (sh *StatsSnapshot) TimestampTaken() int64 {
+	return sh.TimestampCreated
 }
 
-func (sh *StatsSnapshot) GetDurations() map[string]statistics.Distribution {
-	return sh.Durations
+func (sh *StatsSnapshot) Durations() map[string]api.Distribution {
+	return sh.DurationsSnapshot
 }
 
-func (sh *StatsSnapshot) GetCounters() map[string]int64 {
-	return sh.Counters
+func (sh *StatsSnapshot) Counters() map[string]int64 {
+	return sh.CountersSnapshot
 }
 
-func (sh *StatsSnapshot) GetSamples() map[string]statistics.Distribution {
-	return sh.Samples
+func (sh *StatsSnapshot) Samples() map[string]api.Distribution {
+	return sh.SamplesSnapshot
 }
