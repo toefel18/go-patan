@@ -15,13 +15,22 @@
  *     limitations under the License.
  *
  */
-package concrete
+package statistics
 
-//import (
-//	"testing"
-//)
-//
-//func TestNewStore(t *testing.T) {
-//	// implement this test
-//	NewStore()
-//}
+import (
+    "log"
+    "github.com/toefel18/go-patan/statistics/concrete"
+)
+
+// Standard instance of patan, ready to use
+var stdStore *concrete.StatStore
+var std *Facade
+
+
+// Initializes a global instance of patan.
+func init() {
+    log.Println("intializing global instance of patan")
+    stdStore = concrete.NewStore()
+    std = concrete.NewFacade(stdStore)
+    log.Println("global version of patan initialized")
+}

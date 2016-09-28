@@ -18,25 +18,10 @@
 package concrete
 
 import (
-	"time"
+	"testing"
 )
 
-const (
-	NANOS_IN_SEC = 1000000
-)
-
-type Stopwatch struct {
-	time.Time
-}
-
-func startNewStopwatch() *Stopwatch {
-	return &Stopwatch{time.Now()}
-}
-
-func (sw *Stopwatch) ElapsedMillis() int64 {
-	return sw.ElapsedNanos() / NANOS_IN_SEC
-}
-
-func (sw *Stopwatch) ElapsedNanos() int64 {
-	return time.Now().Sub(sw.Time).Nanoseconds()
+func TestNewStore(t *testing.T) {
+	// implement this test
+	NewStore()
 }

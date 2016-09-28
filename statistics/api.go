@@ -39,7 +39,7 @@ type Snapshot interface {
 	GetSamples() map[string]Distribution
 }
 
-type Store interface {
+type Facade interface {
 	StartStopwatch() Stopwatch
 
 	// Finds a duration and returns (true, duration distribution) if found else (false, distribution with all fields set to 0)

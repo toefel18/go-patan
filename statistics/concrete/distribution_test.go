@@ -1,14 +1,14 @@
 package concrete
 
 import (
+	"github.com/toefel18/go-patan/statistics"
 	"math"
 	"testing"
-    "github.com/toefel18/go-patan/statistics"
 )
 
 func TestNewDistribution(t *testing.T) {
 	var dist statistics.Distribution
-    dist = NewDistribution()
+	dist = NewDistribution()
 	assertDistributionHasValues(dist, 0, math.MaxInt64, math.MinInt64, 0.0, 0.0, 0.0, t)
 }
 
@@ -16,10 +16,10 @@ func TestAddSample(t *testing.T) {
 	dist := NewDistribution()
 	dist.addSample(10)
 	assertDistributionHasValues(dist, 1, 10, 10, 10.0, 0.0, math.NaN(), t)
-    dist.addSample(20)
-    assertDistributionHasValues(dist, 2, 10, 20, 15.0, 50.0, 7.0710, t)
-    dist.addSample(0)
-    assertDistributionHasValues(dist, 3, 0, 20, 10.0, 50.0, 10.0, t)
+	dist.addSample(20)
+	assertDistributionHasValues(dist, 2, 10, 20, 15.0, 50.0, 7.0710, t)
+	dist.addSample(0)
+	assertDistributionHasValues(dist, 3, 0, 20, 10.0, 50.0, 10.0, t)
 }
 
 func assertDistributionHasValues(dist statistics.Distribution, sampleCount, min, max int64, avg, variance, stdDev float64, t *testing.T) {
@@ -46,8 +46,8 @@ func assertDistributionHasValues(dist statistics.Distribution, sampleCount, min,
 var EPSILON float64 = 0.0001
 
 func floatEquals(a, b float64) bool {
-    if ((b - a) < EPSILON) {
-        return true
-    }
-    return false
+	if (b - a) < EPSILON {
+		return true
+	}
+	return false
 }
