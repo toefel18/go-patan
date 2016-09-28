@@ -42,15 +42,6 @@ type Snapshot interface {
 type Facade interface {
 	StartStopwatch() Stopwatch
 
-	// Finds a duration and returns (duration-distribution, true) if found else (distribution with all fields set to 0, false)
-	FindDuration(key string) (Distribution, bool)
-
-	// Finds a counter and returns (counter value, true) if found, else (0, false)
-	FindCounter(key string) (int64, bool)
-
-	// Finds a sample and returns (sample-distribution, true) if found else (distribution with all fields set to 0, false)
-	FindSample(key string) (Distribution, bool)
-
 	// Records the elapsed time of the stopwatch and adds that to the distribution identified by key.
 	// Returns the recorded millis
 	RecordElapsedTime(key string, stopwatch Stopwatch) int64

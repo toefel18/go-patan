@@ -20,10 +20,10 @@ package concrete
 import "github.com/toefel18/go-patan/statistics/api"
 
 type Facade struct {
-    store *StatStore
+    store *Store
 }
 
-func NewFacade(store *StatStore) *Facade {
+func NewFacade(store *Store) *Facade {
     if store == nil {
         panic("store = nil, Facade needs a store")
     }
@@ -34,32 +34,16 @@ func (facade Facade) StartStopwatch() api.Stopwatch {
     return startNewStopwatch()
 }
 
-func (facade Facade) FindDuration(key string) (api.Distribution, bool) {
-    return NewDistribution(), false
-    //return getOrEmpty(facade.store.durations, key)
-}
-
-func (facade Facade) FindCounter(key string) (int64, bool) {
-    return 0, false
-    //return *facade.store.counters[key]
-}
-
-func (facade Facade) FindSample(key string) (api.Distribution, bool) {
-    return NewDistribution(), false
-    //return getOrEmpty(facade.store.samples, key)
-}
-
 func (facade Facade) RecordElapsedTime(key string, stopwatch api.Stopwatch) int64 {
-    return 0
-    //millis := stopwatch.ElapsedMillis()
-    //if distribution, exists := facade.store.durations[key]; exists {
-    //    distribution.addSample(millis)
-    //} else {
-    //    newDistribution := &Distribution{}
-    //    newDistribution.addSample(millis)
-    //    facade.store.durations[key] = newDistribution
-    //}
-    //return millis
+    millis := stopwatch.ElapsedMillis()
+    if distribution, exists := facade.store.durations[key]; exists {
+        distribution.addSample(millis)
+    } else {
+        newDistribution := &Distribution{}
+        newDistribution.addSample(millis)
+        facade.store.durations[key] = newDistribution
+    }
+    return millis
 }
 
 func (facade Facade) MeasureFunc(key string, subject func()) int64 {
