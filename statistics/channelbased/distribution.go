@@ -1,4 +1,4 @@
-package concrete
+package channelbased
 
 import (
 	"math"

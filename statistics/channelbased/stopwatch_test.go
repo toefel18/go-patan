@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package concrete
+package channelbased
 
 import (
 	"fmt"
@@ -48,9 +48,9 @@ func TestStartStopwatch(t *testing.T) {
 }
 
 func TestStopwatchImplementsApiInterface(t *testing.T) {
-	var concreteSw *Stopwatch = startNewStopwatch()
-	var apiSw api.Stopwatch = concreteSw
+	var channelbasedSw *Stopwatch = startNewStopwatch()
+	var apiSw api.Stopwatch = channelbasedSw
 	if apiSw.ElapsedMillis() > 100 {
-		t.Error("concrete.Stopwatch has problems implementing api.Stopwatch")
+		t.Error("channelbased.Stopwatch has problems implementing api.Stopwatch")
 	}
 }

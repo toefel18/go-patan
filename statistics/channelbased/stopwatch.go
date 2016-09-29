@@ -15,14 +15,10 @@
  *     limitations under the License.
  *
  */
-package concrete
+package channelbased
 
 import (
 	"time"
-)
-
-const (
-	NANOS_IN_SEC = 1000000
 )
 
 type Stopwatch struct {
@@ -34,7 +30,7 @@ func startNewStopwatch() *Stopwatch {
 }
 
 func (sw *Stopwatch) ElapsedMillis() int64 {
-	return sw.ElapsedNanos() / NANOS_IN_SEC
+	return sw.ElapsedNanos() / time.Millisecond.Nanoseconds()
 }
 
 func (sw *Stopwatch) ElapsedNanos() int64 {

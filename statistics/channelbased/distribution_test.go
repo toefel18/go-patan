@@ -1,4 +1,4 @@
-package concrete
+package channelbased
 
 import (
 	"math"
@@ -22,7 +22,7 @@ func TestAddSample(t *testing.T) {
 	assertDistributionHasValues(dist, 3, 0, 20, 10.0, 50.0, 10.0, t)
 }
 
-func assertDistributionHasValues(dist *Distribution, sampleCount, min, max int64, avg, variance, stdDev float64, t *testing.T) {
+func assertDistributionHasValues(dist api.Distribution, sampleCount, min, max int64, avg, variance, stdDev float64, t *testing.T) {
 	if dist.SampleCount() != sampleCount {
 		t.Errorf("expected sample count to be %v but was %v", sampleCount, dist.SampleCount())
 	}
@@ -45,10 +45,10 @@ func assertDistributionHasValues(dist *Distribution, sampleCount, min, max int64
 
 func TestDistributionImplementsInterface(t *testing.T) {
 	var apiDist api.Distribution
-	var concreteDist *Distribution = NewDistribution()
-	apiDist = concreteDist
+	var channelbasedDist *Distribution = NewDistribution()
+	apiDist = channelbasedDist
 	if apiDist.SampleCount() != 0 {
-		t.Error("concrete.Distribution has problems implementing api.Distribution interface")
+		t.Error("channelbased.Distribution has problems implementing api.Distribution interface")
 	}
 }
 

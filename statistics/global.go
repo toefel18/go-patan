@@ -19,7 +19,7 @@ package patan
 
 import (
     "log"
-    "github.com/toefel18/go-patan/statistics/concrete"
+    "github.com/toefel18/go-patan/statistics/channelbased"
     "github.com/toefel18/go-patan/statistics/api"
 )
 
@@ -30,7 +30,9 @@ var std api.Facade
 // Initializes a global instance of patan.
 func init() {
     log.Println("intializing global instance of patan")
-    concreteFacade := concrete.NewFacade(concrete.NewStore())
-    std = concreteFacade
+    store := channelbased.NewStore()
+    go store.StoreUpdater()
+    channelbasedFacade := channelbased.NewFacade(store)
+    std = channelbasedFacade
     log.Println("global version of patan initialized")
 }

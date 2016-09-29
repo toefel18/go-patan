@@ -64,7 +64,7 @@ type Facade interface {
 
 	// Adds value to the counter identified with key with key, if the counter does not yet exist, it will be created
 	// and initialized to value. Value can be negative.
-	AddToCounter(key string, value int)
+	AddToCounter(key string, value int64)
 
 	// Adds a value to the sample distribution identified by key. If the distribution does not yet exist, value will be it's initial value.
 	AddSample(key string, value int64)
@@ -77,4 +77,7 @@ type Facade interface {
 
 	// Creates a snapshot and then calls Reset()
 	SnapshotAndReset() Snapshot
+
+	// Free up resources
+	Close();
 }
