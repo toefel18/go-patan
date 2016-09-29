@@ -46,12 +46,6 @@ func (facade *Facade) MeasureFunc(key string, subject func()) int64 {
     return facade.RecordElapsedTime(key, sw)
 }
 
-func (facade *Facade) MeasureFuncWithReturn(key string, subject func() interface{}) (int64, interface{}) {
-    sw := startNewStopwatch()
-    returnVal := subject()
-    return facade.RecordElapsedTime(key, sw), returnVal
-}
-
 func (facade *Facade) IncrementCounter(key string) {
     facade.AddToCounter(key, 1)
 }

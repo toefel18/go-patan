@@ -22,7 +22,7 @@ type Stopwatch interface {
 	ElapsedNanos() int64
 }
 
-// Models a sampling distribution
+// Models a statistical distribution
 type Distribution interface {
 	SampleCount() int64
 	Min() int64
@@ -50,10 +50,6 @@ type Facade interface {
 	// Returns the recorded millis
 	MeasureFunc(key string, subject func()) int64
 
-	// Records duration of the subject function and adds that to the distribution identified by key.
-	// Returns the recorded millis and the returned value of the subject function
-	MeasureFuncWithReturn(key string, subject func() interface{}) (int64, interface{})
-
 	// Increments the counter identified with key by 1. If the counter does not yet exist, it will be created
 	// with initial value of 1
 	IncrementCounter(key string)
@@ -73,9 +69,23 @@ type Facade interface {
 	Reset()
 
 	// Creates a snapshot containing all currently registered durations, counters and samples
+
+	// USAGE NOTE: Invocation order does not necessarily reflect the processing order! Users should
+	// not depend on that. Consider the following example:
+	//
+	// stopwatch := statistics.StartStopwatch()
+	// ... heavy work for 3 seconds
+	// statistics.RecordElapsedTime("my.heavy.operation", stopwatch)   // A
+	// snapshot := statistics.Snapshot()                               // B
+	//
+	// It is possible (and even likely) that snapshot doesn't have my.heavy.operation yet, meaning that
+	// B is executed earlier than A! This differs from the java version of Patan and is a consequence
+	// of the non-blocking setup with channels. This is OK because patan is meant to give insight in
+	// the distribution of data over a longer period of time, not for individual measurements.
 	Snapshot() Snapshot
 
 	// Creates a snapshot and then calls Reset()
+	// Also, see documentation above
 	SnapshotAndReset() Snapshot
 
 	// Free up resources

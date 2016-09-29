@@ -50,7 +50,10 @@ func TestFacadeImplementsApiInterface(t *testing.T) {
 	if apiFacade.StartStopwatch() == nil {
 		t.Error("channelbased.Facade has problems implementing the api.Facade")
 	}
+}
 
+func returnFourtyTwo() int64{
+	return 42
 }
 
 func TestFacadeHappyFlow(t *testing.T) {
