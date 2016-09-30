@@ -52,10 +52,6 @@ func TestFacadeImplementsApiInterface(t *testing.T) {
 	}
 }
 
-func returnFourtyTwo() int64{
-	return 42
-}
-
 func TestFacadeHappyFlow(t *testing.T) {
 	facade := NewFacade(NewStore())
 	defer facade.Close()

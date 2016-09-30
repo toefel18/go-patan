@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package patan
+package statistics
 
 import (
 	"github.com/toefel18/go-patan/statistics/api"

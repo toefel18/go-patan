@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package patan
+package statistics
 
 import (
 	"fmt"
@@ -52,5 +52,22 @@ func TestConcurrency(t *testing.T) {
 	}
 	if snapshot.Samples()["concurrency.sample"].SampleCount() != 2000000 {
 		t.Error("There should be 2000000 samples but got", snapshot.Samples()["concurrency.sample"].SampleCount())
+	}
+	Reset()
+}
+
+func TestEmptyCounters(t *testing.T) {
+	Reset()
+	snapshot := Snapshot()
+	if snapshot.Counters()["nonexistingcounter"] != 0 {
+		t.Error("nonexisting counter should be 0")
+	}
+	_, exists := snapshot.Durations()["nonexistingduration"]
+	if exists == true {
+		t.Error("nonexisting duration should not exist")
+	}
+	_, exists2 := snapshot.Samples()["nonexistingsample"]
+	if exists2 == true {
+		t.Error("nonexisting duration should not exist")
 	}
 }
