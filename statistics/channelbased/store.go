@@ -4,6 +4,7 @@ import (
 	"github.com/toefel18/go-patan/statistics/api"
 	"log"
 	"time"
+	"math"
 )
 
 type NewMeasurement struct {
@@ -127,6 +128,9 @@ func deepCopy(source map[string]*Distribution) map[string]api.Distribution {
 	distMapCopy := make(map[string]api.Distribution)
 	for key, distribution := range source {
 		valueCopy := *distribution // dereference pointer to get a copy of the struct
+		if math.IsNaN(valueCopy.StdDeviation) {
+			valueCopy.StdDeviation = -1.0
+		}
 		distMapCopy[key] = &valueCopy
 	}
 	return distMapCopy

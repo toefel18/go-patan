@@ -18,7 +18,9 @@
 package statistics
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -69,5 +71,31 @@ func TestEmptyCounters(t *testing.T) {
 	_, exists2 := snapshot.Samples()["nonexistingsample"]
 	if exists2 == true {
 		t.Error("nonexisting duration should not exist")
+	}
+}
+
+func TestJsonize(t *testing.T) {
+	Reset()
+	sw := StartStopwatch()
+	IncrementCounter("json.counter")
+	AddSample("json.sample", 15)
+	AddSample("json.sample", 25)
+	time.Sleep(20 * time.Millisecond)
+	RecordElapsedTime("json.duration", sw)
+	time.Sleep(20 * time.Millisecond)
+	snapshot := Snapshot()
+	json, err := json.Marshal(snapshot)
+	if err == nil {
+		jsonString := string(json)
+		if !strings.Contains(jsonString, "json.duration") ||
+			!strings.Contains(jsonString, "sampleCount") ||
+			!strings.Contains(jsonString, "minimum") ||
+			!strings.Contains(jsonString, "maximum") ||
+			!strings.Contains(jsonString, "average") ||
+			!strings.Contains(jsonString, "standardDeviation") {
+			t.Error("the json output does not contain some of the expected values")
+		}
+	} else {
+		t.Error("json marshalling failed", err)
 	}
 }

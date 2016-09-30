@@ -5,55 +5,55 @@ import (
 )
 
 type Distribution struct {
-	sampleCount int64   `json:"sampleCount"`
-	min         int64   `json:"minimum"`
-	max         int64   `json:"maximum"`
-	avg         float64 `json:"sampleAverage"`
-	variance    float64 `json:"sampleVariance"`
-	stdDev      float64 `json:"sampleStdDeviation"`
+	Samples       int64   `json:"sampleCount"`
+	Minimum       int64   `json:"minimum"`
+	Maximum       int64   `json:"maximum"`
+	Average       float64 `json:"average"`
+	totalVariance float64  // since this value is not useful to expose
+	StdDeviation  float64 `json:"standardDeviation"`
 }
 
 func NewDistribution() *Distribution {
-	return &Distribution{min: math.MaxInt64, max: math.MinInt64}
+	return &Distribution{Minimum: math.MaxInt64, Maximum: math.MinInt64}
 }
 
 func (dist *Distribution) SampleCount() int64 {
-	return dist.sampleCount
+	return dist.Samples
 }
 
 func (dist *Distribution) Min() int64 {
-	return dist.min
+	return dist.Minimum
 }
 
 func (dist *Distribution) Max() int64 {
-	return dist.max
+	return dist.Maximum
 }
 
 func (dist *Distribution) Avg() float64 {
-	return dist.avg
+	return dist.Average
 }
 
 func (dist *Distribution) Variance() float64 {
-	return dist.variance
+	return dist.totalVariance
 }
 
 func (dist *Distribution) StdDev() float64 {
-	return dist.stdDev
+	return dist.StdDeviation
 }
 
 func (dist *Distribution) addSample(value int64) {
-	updatedSampleCount := dist.sampleCount + 1
-	updatedMin := min(value, dist.min)
-	updatedMax := max(value, dist.max)
-	updatedAvg := dist.avg + ((float64(value) - dist.avg) / float64(updatedSampleCount))
-	updatedVar := dist.variance + ((float64(value) - dist.avg) * (float64(value) - updatedAvg))
-	updatedStdDev := math.Sqrt(updatedVar / float64(dist.sampleCount))
-	dist.sampleCount = updatedSampleCount
-	dist.min = updatedMin
-	dist.max = updatedMax
-	dist.avg = updatedAvg
-	dist.variance = updatedVar
-	dist.stdDev = updatedStdDev
+	updatedSampleCount := dist.Samples + 1
+	updatedMin := min(value, dist.Minimum)
+	updatedMax := max(value, dist.Maximum)
+	updatedAvg := dist.Average + ((float64(value) - dist.Average) / float64(updatedSampleCount))
+	updatedVar := dist.totalVariance + ((float64(value) - dist.Average) * (float64(value) - updatedAvg))
+	updatedStdDev := math.Sqrt(updatedVar / float64(dist.Samples))
+	dist.Samples = updatedSampleCount
+	dist.Minimum = updatedMin
+	dist.Maximum = updatedMax
+	dist.Average = updatedAvg
+	dist.totalVariance = updatedVar
+	dist.StdDeviation = updatedStdDev
 }
 
 func min(a, b int64) int64 {
