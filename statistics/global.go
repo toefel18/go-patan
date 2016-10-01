@@ -19,8 +19,8 @@ package statistics
 
 import (
 	"github.com/toefel18/go-patan/statistics/api"
-	"github.com/toefel18/go-patan/statistics/channelbased"
 	"log"
+	"github.com/toefel18/go-patan/statistics/lockbased"
 )
 
 // USAGE NOTE: Invocation order does not necessarily reflect the processing order! Users should
@@ -42,7 +42,7 @@ var std api.Facade
 // Initializes a global instance of patan.
 func init() {
 	log.Println("[STATISTICS] intializing global instance of patan")
-	std = channelbased.NewFacade(channelbased.NewStore())
+	std = lockbased.NewFacade(lockbased.NewStore())
 	log.Println("[STATISTICS] global version of patan initialized")
 }
 

@@ -24,38 +24,51 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"github.com/toefel18/go-patan/statistics/lockbased"
 )
 
 func TestConcurrency(t *testing.T) {
-	IncrementCounter("counter.1")
+	Benchmrk(10, 20000)
+	Benchmrk(100, 20000)
+	Benchmrk(1000, 20000)
+	Benchmrk(10, 200000)
+	Benchmrk(100, 200000)
+}
+
+func Benchmrk(threads int64, itemsPerThread int64) {
+	millisStart := currentTimeMillis()
 	wg := sync.WaitGroup{}
-	for i := 0; i < 10; i++ {
+	subject := lockbased.NewFacade(lockbased.NewStore())
+	for i := int64(0); i < threads; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			sw := StartStopwatch()
-			defer RecordElapsedTime("goroutine.duration", sw)
-			for i := 0; i < 200000; i++ {
-				IncrementCounter("concurrency.counter")
-				AddSample("concurrency.sample", int64(i))
+			defer subject.RecordElapsedTime("goroutine.duration", sw)
+			for i := int64(0); i < itemsPerThread; i++ {
+				subject.IncrementCounter("concurrency.counter")
+				subject.AddSample("concurrency.sample", i)
 			}
-			fmt.Println("done!")
 		}()
 	}
 	wg.Wait()
-	fmt.Println("goroutines done")
-	time.Sleep(20 * time.Millisecond)
-	snapshot := Snapshot()
-	if snapshot.Counters()["concurrency.counter"] != 2000000 {
-		t.Error("Counter should be 2000000 but was", snapshot.Counters()["concurrency.counter"])
+	snapshot := subject.Snapshot()
+	expectedItems := threads * itemsPerThread
+	if snapshot.Counters()["concurrency.counter"] != expectedItems {
+		panic(fmt.Sprint(expectedItems, "counters expected, but got", snapshot.Counters()["concurrency.counter"]))
 	}
-	if snapshot.Durations()["goroutine.duration"].SampleCount() != 10 {
-		t.Error("There should be 10 durations registered but was", snapshot.Durations()["goroutine.duration"].SampleCount())
+	if snapshot.Durations()["goroutine.duration"].SampleCount() != threads {
+		panic(fmt.Sprint("There should be",threads, "durations registered but got", snapshot.Durations()["goroutine.duration"].SampleCount()))
 	}
-	if snapshot.Samples()["concurrency.sample"].SampleCount() != 2000000 {
-		t.Error("There should be 2000000 samples but got", snapshot.Samples()["concurrency.sample"].SampleCount())
+	if snapshot.Samples()["concurrency.sample"].SampleCount() != threads * itemsPerThread{
+		panic(fmt.Sprint(expectedItems, "samples expected but got", snapshot.Samples()["concurrency.sample"].SampleCount()))
 	}
-	Reset()
+	millisEnd := currentTimeMillis()
+	fmt.Println(threads, "threads with", itemsPerThread, "items took", (millisEnd - millisStart))
+}
+
+func currentTimeMillis() int64 {
+	return time.Now().UnixNano() / time.Millisecond.Nanoseconds()
 }
 
 func TestEmptyCounters(t *testing.T) {
