@@ -43,7 +43,7 @@ func Benchmrk(threads int64, itemsPerThread int64) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			sw := StartStopwatch()
+			sw := subject.StartStopwatch()
 			defer subject.RecordElapsedTime("goroutine.duration", sw)
 			for i := int64(0); i < itemsPerThread; i++ {
 				subject.IncrementCounter("concurrency.counter")

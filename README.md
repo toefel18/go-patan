@@ -11,7 +11,7 @@ When serializing a snapshot to JSON, it will differ from the java version of pat
 occurrences are renamed to counters.  
 
 
-**USAGE NOTE**: Invocation order does not necessarily reflect the processing order! Users should
+**USAGE NOTE FOR CHANNEL BASED IMPLEMENTATION**: Invocation order does not necessarily reflect the processing order! Users should
  not depend on that. Consider the following example:
 
 ```go
@@ -41,3 +41,5 @@ It is possible (and even likely) that snapshot doesn't have my.heavy.operation y
 B is executed earlier than A! This differs from the java version of Patan and is a consequence
 of the non-blocking setup with channels. This is OK because patan is meant to give insight in
 the distribution of data over a longer period of time, not for individual measurements.
+
+**The lock based implementation is always up to date after each call**

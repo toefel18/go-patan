@@ -23,19 +23,6 @@ import (
 	"github.com/toefel18/go-patan/statistics/lockbased"
 )
 
-// USAGE NOTE: Invocation order does not necessarily reflect the processing order! Users should
-// not depend on that. Consider the following example:
-//
-// stopwatch := statistics.StartStopwatch()
-// ... heavy work for 3 seconds
-// statistics.RecordElapsedTime("my.heavy.operation", stopwatch)   // A
-// snapshot := statistics.Snapshot()                               // B
-//
-// It is possible (and even likely) that snapshot doesn't have my.heavy.operation yet, meaning that
-// B is executed earlier than A! This differs from the java version of Patan and is a consequence
-// of the non-blocking setup with channels. This is OK because patan is meant to give insight in
-// the distribution of data over a longer period of time, not for individual measurements.
-
 // Standard instance of patan, ready to use
 var std api.Facade
 

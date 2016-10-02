@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type Store struct {
 // Creates a new store and starts a go-routine that listens for requests on the channels.
 // Don't forget to call store.Close() when throwing away the store!
 func NewStore() *Store {
+	atomic.Value{}
 	store := &Store{
 		durations: make(map[string]*Distribution),
 		counters:  make(map[string]int64),
