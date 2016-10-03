@@ -5,7 +5,6 @@ import (
 	"log"
 	"math"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -15,18 +14,17 @@ type Store struct {
 	counters  map[string]int64
 	samples   map[string]*Distribution
 
-	lock *sync.Mutex
+	lock sync.Mutex
 }
 
 // Creates a new store and starts a go-routine that listens for requests on the channels.
 // Don't forget to call store.Close() when throwing away the store!
 func NewStore() *Store {
-	atomic.Value{}
 	store := &Store{
 		durations: make(map[string]*Distribution),
 		counters:  make(map[string]int64),
 		samples:   make(map[string]*Distribution),
-		lock:      &sync.Mutex{},
+		lock:      sync.Mutex{},
 	}
 	log.Println("[STATISTICS] created new lockbased store")
 	return store
@@ -42,25 +40,26 @@ func (store *Store) addDuration(key string, value int64) {
 
 func (store *Store) addToCounter(key string, value int64) {
 	store.lock.Lock()
-	defer store.lock.Unlock()
 	store.counters[key] = store.counters[key] + value
+	store.lock.Unlock()
 }
 
 func (store *Store) addToStore(destination map[string]*Distribution, key string, value int64) {
 	store.lock.Lock()
-	defer store.lock.Unlock()
 	distribution, exists := destination[key]
 	if !exists {
 		distribution = NewDistribution()
 		destination[key] = distribution
 	}
 	distribution.addSample(value)
+	store.lock.Unlock()
 }
 
 func (store *Store) Snapshot() api.Snapshot {
 	store.lock.Lock()
-	defer store.lock.Unlock()
-	return store.doGetSnapshot()
+	snapshot := store.doGetSnapshot()
+	store.lock.Unlock()
+	return snapshot
 }
 
 func (store *Store) doGetSnapshot() api.Snapshot {
@@ -78,16 +77,16 @@ func (store *Store) doGetSnapshot() api.Snapshot {
 
 func (store *Store) SnapshotAndReset() api.Snapshot {
 	store.lock.Lock()
-	defer store.lock.Unlock()
 	snapshot := store.doGetSnapshot()
 	store.doReset()
+	store.lock.Unlock()
 	return snapshot
 }
 
 func (store *Store) Reset() {
 	store.lock.Lock()
-	defer store.lock.Unlock()
 	store.doReset()
+	store.lock.Unlock()
 }
 
 func (store *Store) doReset() {
