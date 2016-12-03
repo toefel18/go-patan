@@ -23,13 +23,12 @@ import (
 	"time"
 
 	"github.com/toefel18/go-patan/statistics/api"
-	"github.com/toefel18/go-patan/statistics/common/commontest"
 )
 
 func TestStartStopwatch(t *testing.T) {
 	sw := StartNewStopwatch()
 	elapsedMillis := sw.ElapsedMillis()
-	if !commontest.FloatEquals(elapsedMillis, 0) {
+	if elapsedMillis > 1 {
 		t.Errorf("newly created stopwatch already has already %v millis elapsed, could indicate programming error", elapsedMillis)
 	}
 

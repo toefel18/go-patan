@@ -49,10 +49,7 @@ var Epsilon = 0.001
 
 // FloatEquals compares two floats and returns true if they are close enougth
 func FloatEquals(a, b float64) bool {
-	if math.Abs(b-a) < Epsilon {
-		return true
-	}
-	return false
+	return math.Abs(b-a) < Epsilon
 }
 
 // CloseTo tests if b is close to a with the given offset
