@@ -1,13 +1,13 @@
 # ![patan-logo](go-patan.png)-patan a small library for gathering statistics.
 
-[![Build Status](https://travis-ci.org/toefel18/go-patan.svg?branch=master)](https://travis-ci.org/toefel18/go-patan) [![codecov.io](https://codecov.io/github/toefel18/go-patan/coverage.svg?branch=master "coverage")](https://codecov.io/github/toefel18/go-patan)
+[![Build Status](https://travis-ci.org/toefel18/go-patan.svg?branch=master)](https://travis-ci.org/toefel18/go-patan) [![codecov.io](https://codecov.io/github/toefel18/go-patan/coverage.svg?branch=master "coverage")](https://codecov.io/github/toefel18/go-patan) [![Go Report Card](https://goreportcard.com/badge/github.com/toefel18/go-patan)](https://goreportcard.com/report/github.com/toefel18/go-patan)
 
-Golang port of the java sampling library [patan](https://github.com/toefel18/patan) that provides: 
+Golang port of the java sampling library [patan](https://github.com/toefel18/patan) that provides:
   - counters; keeping track of how many times *something* has taken place
   - sampling; collecting samples and describing their distribution
   - durations; measuring the duration of a task as a special case of sampling
-  
-The API is not identical to the java version, some methods are named differently. 
+
+The API is not identical to the java version, some methods are named differently.
 
 When serializing a snapshot to JSON, it should produce the same output as the java version.
 
@@ -15,7 +15,7 @@ Start with:
 ```
 go get github.com/toefel18/go-patan
 ```
-  
+
 Usage:
 ```go
 package main
@@ -89,19 +89,19 @@ The output will be:
 }
 ```
 
-The default statistics instance, which is always and directly available when using patan (see code example, `statistics` 
+The default statistics instance, which is always and directly available when using patan (see code example, `statistics`
 is the default available instance) uses a lock-based implementation. For more info on implementations, read on.
 
 ## API implementations
-There are two implementations, one based on channels and another based on locks. Micro benchmarks 
-were in favor of the lock-based implementation and it also shows direct consistency whereas the 
-channel-based implementation is eventual consistent. 
+There are two implementations, one based on channels and another based on locks. Micro benchmarks
+were in favor of the lock-based implementation and it also shows direct consistency whereas the
+channel-based implementation is eventual consistent.
 
 #### Lock-based  implementation
 The implementation is direct consistent.
 
-#### Channel-based  implementation
-This implementation is eventual consitent and the invocation order does not necessarily reflect the 
+#### Channel-based  implementation (DEPRECATED)
+This implementation is eventual consitent and the invocation order does not necessarily reflect the
 processing order! Users should not depend on that. Consider the example code above when it would
 use a channel-based implementation:
 
@@ -109,4 +109,4 @@ It is possible (and even likely) that snapshot does not have my.heavy.operation 
 B is executed earlier than A! This differs from the java version of Patan and is a consequence
 of the non-blocking setup with channels. This is OK because patan is meant to give insight in
 the distribution of data over a longer period of time, not for individual measurements.
-git 
+git

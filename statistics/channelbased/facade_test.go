@@ -19,12 +19,14 @@
 package channelbased
 
 import (
-	"testing"
-	"github.com/toefel18/go-patan/statistics/api"
-	"time"
-	"github.com/toefel18/go-patan/statistics/common/commontest"
 	"math"
+	"runtime"
+	"testing"
+	"time"
+
+	"github.com/toefel18/go-patan/statistics/api"
 	"github.com/toefel18/go-patan/statistics/common"
+	"github.com/toefel18/go-patan/statistics/common/commontest"
 )
 
 func TestNewFacade(t *testing.T) {
@@ -47,7 +49,7 @@ func TestNewFacadeWithNilStore(t *testing.T) {
 }
 
 func TestFacadeImplementsApiInterface(t *testing.T) {
-	var facade *Facade = NewFacade(NewStore())
+	var facade = NewFacade(NewStore())
 	defer facade.Close()
 	var apiFacade api.Facade = facade
 	if apiFacade.StartStopwatch() == nil {
@@ -58,9 +60,16 @@ func TestFacadeImplementsApiInterface(t *testing.T) {
 func TestFacadeHappyFlow(t *testing.T) {
 	facade := NewFacade(NewStore())
 	defer facade.Close()
+
+	facade.AddSample("some.sample", 10)
+	time.Sleep(50 * time.Millisecond)
+	facade.Reset() // immediatelly delete data again
+	time.Sleep(50 * time.Millisecond)
+	runtime.Gosched()
+
 	// add some test data
 	facade.AddSample("some.sample", 10)
-	facade.MeasureFunc("some.duration", func(){ time.Sleep(100 * time.Millisecond) })
+	facade.MeasureFunc("some.duration", func() { time.Sleep(100 * time.Millisecond) })
 	facade.IncrementCounter("some.counter")
 
 	// allow the other goroutine to process the results
@@ -95,7 +104,7 @@ func TestFacadeHappyFlow(t *testing.T) {
 
 	// same test as before to assert that everything still works after reset
 	facade.AddSample("some.sample", 10)
-	facade.MeasureFunc("some.duration", func(){ time.Sleep(100 * time.Millisecond) })
+	facade.MeasureFunc("some.duration", func() { time.Sleep(100 * time.Millisecond) })
 	facade.IncrementCounter("some.counter")
 
 	// allow the other goroutine to process the results
@@ -150,14 +159,14 @@ func assertDurationWithin(dist api.Distribution, sampleCount int64, min, max, av
 	if dist.SampleCount() != sampleCount {
 		t.Errorf("expected sample count to be %v but was %v", sampleCount, dist.SampleCount())
 	}
-	if math.Abs(dist.Min() - min) > within {
+	if math.Abs(dist.Min()-min) > within {
 		t.Errorf("expected minimum to be +-%v from %v but was %v", within, min, dist.Min())
 	}
-	if math.Abs(dist.Max() - max) > within {
+	if math.Abs(dist.Max()-max) > within {
 		t.Errorf("expected maximum to be +-%v from %v but was %v", within, max, dist.Max())
 	}
-	if math.Abs(dist.Avg() - float64(avg)) > within {
-		t.Errorf("expected sample average to be +-%v from %v but was %v", within, avg, dist.Avg)
+	if math.Abs(dist.Avg()-float64(avg)) > within {
+		t.Errorf("expected sample average to be +-%v from %v but was %v", within, avg, dist.Avg())
 	}
 	// variance and stddev are tested elsewere
 }

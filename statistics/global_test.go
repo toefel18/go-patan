@@ -24,16 +24,17 @@ import (
 	"sync"
 	"testing"
 	"time"
-	"github.com/toefel18/go-patan/statistics/lockbased"
+
 	"github.com/toefel18/go-patan/statistics/common"
+	"github.com/toefel18/go-patan/statistics/lockbased"
 )
 
 func TestConcurrency(t *testing.T) {
 	Benchmrk(10, 20000)
 	Benchmrk(100, 20000)
 	Benchmrk(500, 10000)
-	Benchmrk(10, 100000)
-	Benchmrk(100, 100000)
+	Benchmrk(10, 50000)
+	Benchmrk(100, 50000)
 }
 
 func Benchmrk(threads int64, itemsPerThread int64) {
@@ -59,9 +60,9 @@ func Benchmrk(threads int64, itemsPerThread int64) {
 		panic(fmt.Sprint(expectedItems, "counters expected, but got", snapshot.Counters()["concurrency.counter"]))
 	}
 	if snapshot.Durations()["goroutine.duration"].SampleCount() != threads {
-		panic(fmt.Sprint("There should be",threads, "durations registered but got", snapshot.Durations()["goroutine.duration"].SampleCount()))
+		panic(fmt.Sprint("There should be", threads, "durations registered but got", snapshot.Durations()["goroutine.duration"].SampleCount()))
 	}
-	if snapshot.Samples()["concurrency.sample"].SampleCount() != threads * itemsPerThread{
+	if snapshot.Samples()["concurrency.sample"].SampleCount() != threads*itemsPerThread {
 		panic(fmt.Sprint(expectedItems, "samples expected but got", snapshot.Samples()["concurrency.sample"].SampleCount()))
 	}
 	millisEnd := common.CurrentTimeMillis()

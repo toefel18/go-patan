@@ -15,11 +15,17 @@
  *     limitations under the License.
  *
  */
+
+// Package statistics contains a ready to use instance of patan. This instance can
+// be used as the sole active instance of patan within the application. Clients
+// are advised to use this. example:
+// statistics.AddSample("key", 123)
 package statistics
 
 import (
-	"github.com/toefel18/go-patan/statistics/api"
 	"log"
+
+	"github.com/toefel18/go-patan/statistics/api"
 	"github.com/toefel18/go-patan/statistics/lockbased"
 )
 
@@ -36,46 +42,60 @@ func init() {
 // The methods below are equal to those of api.Facade and operate on the
 // global instance of api.Facade that is ready to use
 
+// StartStopwatch starts a new stopwatch
 func StartStopwatch() api.Stopwatch {
 	return std.StartStopwatch()
 }
 
+// RecordElapsedTime records the elapsed time of the stopwatch under the distribution identified with key
 func RecordElapsedTime(key string, stopwatch api.Stopwatch) float64 {
 	return std.RecordElapsedTime(key, stopwatch)
 }
 
+// MeasureFunc runs the subject function and records it's execution duration under the distribution identified with key
 func MeasureFunc(key string, subject func()) float64 {
 	return std.MeasureFunc(key, subject)
 }
 
+// IncrementCounter increments the counter identified by key by 1
 func IncrementCounter(key string) {
 	std.IncrementCounter(key)
 }
 
+// DecrementCounter decrements the counter identified by key by 1
 func DecrementCounter(key string) {
 	std.DecrementCounter(key)
 }
 
+// AddToCounter adds value to the counter identified by key, value can be negative
 func AddToCounter(key string, value int64) {
 	std.AddToCounter(key, value)
 }
 
+// AddSample adds a sample to the distribution identified by value, if the distribution doesn't
+// exist, it will be created
 func AddSample(key string, value float64) {
 	std.AddSample(key, value)
 }
 
+// Reset clears the store
 func Reset() {
 	std.Reset()
 }
 
+// Snapshot returns a snapshot of all the counters, durations and samples recorded
+// since creation or the last reset.
 func Snapshot() api.Snapshot {
 	return std.Snapshot()
 }
 
+// SnapshotAndReset returns a snapshot of all the counters, durations and samples recorded
+// since creation or the last reset, and then clears the internal state
 func SnapshotAndReset() api.Snapshot {
 	return std.SnapshotAndReset()
 }
 
+// Close closes the underlying store
 func Close() {
 	std.Close()
 }

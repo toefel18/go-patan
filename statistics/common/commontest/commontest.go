@@ -27,6 +27,10 @@ import (
 
 //AssertDistributionHasValues checks if the distribution contains the expected values
 func AssertDistributionHasValues(dist api.Distribution, sampleCount int64, min, max, avg, stdDev float64, t *testing.T) {
+	if dist == nil {
+		t.Error("dist is nil, the value is not present (look for a Reset() or SnapshotAndReset() on the channelbased)")
+		return
+	}
 	if dist.SampleCount() != sampleCount {
 		t.Errorf("expected sample count to be %v but was %v", sampleCount, dist.SampleCount())
 	}
@@ -54,5 +58,5 @@ func FloatEquals(a, b float64) bool {
 
 // CloseTo tests if b is close to a with the given offset
 func CloseTo(a, b, offset int64) bool {
-	return  b > a - offset && b < a + offset
+	return b > a-offset && b < a+offset
 }

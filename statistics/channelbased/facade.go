@@ -16,6 +16,9 @@
  *
  */
 
+// Package channelbased is DEPRECATED, mainly due to the Reset() behaviour. It's unclear
+// when, after a call to Reset(), the state is actually reset. This CAN lead
+// to unexpected behaviour. Clients are advised to use the lockbased implementation.
 package channelbased
 
 import (

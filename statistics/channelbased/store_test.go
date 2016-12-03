@@ -41,21 +41,14 @@ func TestNewStore(t *testing.T) {
 	store.Close()
 }
 
-//func TestMultipleCloseDoesNotHang(t *testing.T) {
-//	finished := make(chan bool)
-//	go func(finished chan bool) {
-//		store := NewStore()
-//		store.Close()
-//		store.Close()
-//		store.Close()
-//		finished <- true
-//	}(finished)
-//	select {
-//	case <-finished:
-//	case <-time.After(500 * time.Millisecond):
-//		t.Error("closing the store in multiple goroutines at once causes hang!")
-//	}
-//}
+func TestMultipleCloseDoesNotHang(t *testing.T) {
+	store := NewStore()
+	store.Close()
+	time.Sleep(100 * time.Millisecond)
+	store.Close()
+	time.Sleep(100 * time.Millisecond)
+	store.Close()
+}
 
 func TestAddDurationUpdate(t *testing.T) {
 	store := NewStore()

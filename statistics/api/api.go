@@ -15,13 +15,16 @@
  *     limitations under the License.
  *
  */
+
+//Package api contains the public interface
 package api
 
+// Stopwatch measures elapsed time
 type Stopwatch interface {
 	ElapsedMillis() float64
 }
 
-// Models a statistical distribution this interface is not json.Marshalled, it's the underlying type, see common.distribution
+// Distribution models a statistical distribution this interface is not json.Marshalled, it's the underlying type, see common.distribution
 type Distribution interface {
 	SampleCount() int64
 	Min() float64
@@ -30,6 +33,7 @@ type Distribution interface {
 	StdDev() float64
 }
 
+// Snapshot resembles an internal snapshot of the data
 type Snapshot interface {
 	CreatedTimestamp() int64
 	StartedTimestamp() int64
@@ -38,6 +42,7 @@ type Snapshot interface {
 	Samples() map[string]Distribution
 }
 
+// Facade is the end-user interface for adding, removing and querying data
 type Facade interface {
 	StartStopwatch() Stopwatch
 
@@ -75,5 +80,5 @@ type Facade interface {
 	SnapshotAndReset() Snapshot
 
 	// Free up resources
-	Close();
+	Close()
 }
