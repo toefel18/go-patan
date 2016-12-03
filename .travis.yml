@@ -1,0 +1,11 @@
+language: java
+
+go:
+  - 1.6
+  - 1.7
+  - tip
+
+script: go test -race ./...
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
