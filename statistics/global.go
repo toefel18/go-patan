@@ -40,11 +40,11 @@ func StartStopwatch() api.Stopwatch {
 	return std.StartStopwatch()
 }
 
-func RecordElapsedTime(key string, stopwatch api.Stopwatch) int64 {
+func RecordElapsedTime(key string, stopwatch api.Stopwatch) float64 {
 	return std.RecordElapsedTime(key, stopwatch)
 }
 
-func MeasureFunc(key string, subject func()) int64 {
+func MeasureFunc(key string, subject func()) float64 {
 	return std.MeasureFunc(key, subject)
 }
 
@@ -60,7 +60,7 @@ func AddToCounter(key string, value int64) {
 	std.AddToCounter(key, value)
 }
 
-func AddSample(key string, value int64) {
+func AddSample(key string, value float64) {
 	std.AddSample(key, value)
 }
 

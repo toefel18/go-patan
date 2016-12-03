@@ -18,16 +18,18 @@
 package channelbased
 
 import (
-	"github.com/toefel18/go-patan/statistics/api"
-	"math"
 	"testing"
 	"time"
+
+	"github.com/toefel18/go-patan/statistics/api"
+	"github.com/toefel18/go-patan/statistics/common"
+	"github.com/toefel18/go-patan/statistics/common/commontest"
 )
 
 const (
 	ProcessingTime = 30 * time.Millisecond
-	Duration = 1
-	Sample = 2
+	Duration       = 1
+	Sample         = 2
 )
 
 func TestNewStore(t *testing.T) {
@@ -67,18 +69,18 @@ func TestAddDurationUpdate(t *testing.T) {
 	var dist api.Distribution
 	// add first item and check that it's added
 	snapshot, dist = addSample(store, Duration, "test.duration", 10, t)
-	assertDistributionHasValues(dist, 1, 10, 10, 10, 0.0, math.NaN(), t)
+	commontest.AssertDistributionHasValues(dist, 1, 10, 10, 10, 0.0, t)
 	assertCountersEmpty(snapshot, t)
 	assertSamplesEmpty(snapshot, t)
 	// add second sample and check that a new snapshot contains the update
 	snapshot, dist = addSample(store, Duration, "test.duration", 20, t)
-	assertDistributionHasValues(dist, 2, 10, 20, 15.0, 50.0, 7.0710, t)
+	commontest.AssertDistributionHasValues(dist, 2, 10, 20, 15.0, 7.0710, t)
 	assertCountersEmpty(snapshot, t)
 	assertSamplesEmpty(snapshot, t)
 
 	// add a third sample and check again
 	snapshot, dist = addSample(store, Duration, "test.duration", 0, t)
-	assertDistributionHasValues(dist, 3, 0, 20, 10.0, 50.0, 10.0, t)
+	commontest.AssertDistributionHasValues(dist, 3, 0, 20, 10.0, 10.0, t)
 	assertCountersEmpty(snapshot, t)
 	assertSamplesEmpty(snapshot, t)
 }
@@ -90,17 +92,17 @@ func TestAddSampleUpdate(t *testing.T) {
 	var dist api.Distribution
 	// add first item and check that it's added
 	snapshot, dist = addSample(store, Sample, "test.sample", 10, t)
-	assertDistributionHasValues(dist, 1, 10, 10, 10, 0.0, math.NaN(), t)
+	commontest.AssertDistributionHasValues(dist, 1, 10, 10, 10, 0.0, t)
 	assertCountersEmpty(snapshot, t)
 	assertDurationsEmpty(snapshot, t)
 	// add second sample and check that a new snapshot contains the update
 	snapshot, dist = addSample(store, Sample, "test.sample", 20, t)
-	assertDistributionHasValues(dist, 2, 10, 20, 15.0, 50.0, 7.0710, t)
+	commontest.AssertDistributionHasValues(dist, 2, 10, 20, 15.0, 7.0710, t)
 	assertCountersEmpty(snapshot, t)
 	assertDurationsEmpty(snapshot, t)
 	// add a third sample and check again
 	snapshot, dist = addSample(store, Sample, "test.sample", 0, t)
-	assertDistributionHasValues(dist, 3, 0, 20, 10.0, 50.0, 10.0, t)
+	commontest.AssertDistributionHasValues(dist, 3, 0, 20, 10.0, 10.0, t)
 	assertCountersEmpty(snapshot, t)
 	assertDurationsEmpty(snapshot, t)
 }
@@ -122,18 +124,18 @@ func TestSnapshotsAreDisconnectedFromStore(t *testing.T) {
 
 	// add first item and check that it's added
 	snapshot1, dist1 := addSample(store, Duration, "test.duration", 10, t)
-	assertDistributionHasValues(dist1, 1, 10, 10, 10, 0.0, math.NaN(), t)
+	commontest.AssertDistributionHasValues(dist1, 1, 10, 10, 10, 0.0, t)
 
 	// add second sample and check that a new snapshot contains the update
 	snapshot2, dist2 := addSample(store, Duration, "test.duration", 20, t)
-	assertDistributionHasValues(dist1, 1, 10, 10, 10, 0.0, math.NaN(), t)
-	assertDistributionHasValues(dist2, 2, 10, 20, 15.0, 50.0, 7.0710, t)
+	commontest.AssertDistributionHasValues(dist1, 1, 10, 10, 10, 0.0, t)
+	commontest.AssertDistributionHasValues(dist2, 2, 10, 20, 15.0, 7.0710, t)
 
 	// add a third sample and check again
 	snapshot3, dist3 := addSample(store, Duration, "another.duration", 10, t)
-	assertDistributionHasValues(dist1, 1, 10, 10, 10, 0.0, math.NaN(), t)
-	assertDistributionHasValues(dist2, 2, 10, 20, 15.0, 50.0, 7.0710, t)
-	assertDistributionHasValues(dist3, 1, 10, 10, 10, 0.0, math.NaN(), t)
+	commontest.AssertDistributionHasValues(dist1, 1, 10, 10, 10, 0.0, t)
+	commontest.AssertDistributionHasValues(dist2, 2, 10, 20, 15.0, 7.0710, t)
+	commontest.AssertDistributionHasValues(dist3, 1, 10, 10, 10, 0.0, t)
 	if len(snapshot1.Durations()) != len(snapshot2.Durations()) || len(snapshot1.Durations()) != 1 {
 		t.Error("snapshot 1 and 2 use the same duration key, so should only have 1 duration but have", len(snapshot1.Durations()), len(snapshot2.Durations()))
 	}
@@ -142,7 +144,7 @@ func TestSnapshotsAreDisconnectedFromStore(t *testing.T) {
 	}
 }
 
-func addSample(store *Store, durationOrSample int, key string, value int64, t *testing.T) (api.Snapshot, api.Distribution) {
+func addSample(store *Store, durationOrSample int, key string, value float64, t *testing.T) (api.Snapshot, api.Distribution) {
 	// send the update to the channel
 	if durationOrSample == Duration {
 		store.durationUpdates <- NewMeasurement{key, value}
@@ -174,11 +176,22 @@ func getSnapshot(store *Store, t *testing.T) api.Snapshot {
 	respondWithSnapshotTo := make(chan api.Snapshot)
 	store.requests <- Request{resetStore: false, createSnapshot: true, snapshotReturnChannel: respondWithSnapshotTo}
 	snapshot := <-respondWithSnapshotTo
-	nowMillis := time.Now().UnixNano() / time.Millisecond.Nanoseconds()
-	if nowMillis - snapshot.TimestampTaken() > 500 {
+	if common.CurrentTimeMillis()-snapshot.CreatedTimestamp() > 500 {
 		t.Error("TimestampTaken of snapshot is older than half a second, possibly an error")
 	}
 	return snapshot
+}
+
+func TestRequestSnapshotWithNilReturnChannel(t *testing.T) {
+	store := NewStore()
+	defer store.Close()
+	store.requests <- Request{resetStore: false, createSnapshot: true}
+	respondWithSnapshotTo := make(chan api.Snapshot)
+	store.requests <- Request{resetStore: false, createSnapshot: true, snapshotReturnChannel: respondWithSnapshotTo}
+	snapshot := <-respondWithSnapshotTo
+	if common.CurrentTimeMillis()-snapshot.CreatedTimestamp() > 500 {
+		t.Error("TimestampTaken of snapshot is older than half a second, possibly an error")
+	}
 }
 
 func assertDurationsEmpty(snapshot api.Snapshot, t *testing.T) {

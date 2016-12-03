@@ -15,43 +15,46 @@
  *     limitations under the License.
  *
  */
+
 package lockbased
 
 import (
-	"github.com/toefel18/go-patan/statistics/api"
 	"log"
-	"math"
 	"sync"
-	"time"
+
+	"github.com/toefel18/go-patan/statistics/api"
+	"github.com/toefel18/go-patan/statistics/common"
 )
 
+//Store holds the state of the lockbased implementation
 type Store struct {
-	// durations, counters and samples should never be modified by anything else than the StoreUpdater method!
-	durations map[string]*Distribution
+	timestampStarted int64
+
+	durations map[string]*common.Distribution
 	counters  map[string]int64
-	samples   map[string]*Distribution
+	samples   map[string]*common.Distribution
 
 	lock sync.Mutex
 }
 
-// Creates a new store and starts a go-routine that listens for requests on the channels.
+// NewStore creates a new store and starts a go-routine that listens for requests on the channels.
 // Don't forget to call store.Close() when throwing away the store!
 func NewStore() *Store {
 	store := &Store{
-		durations: make(map[string]*Distribution),
-		counters:  make(map[string]int64),
-		samples:   make(map[string]*Distribution),
-		lock:      sync.Mutex{},
+		timestampStarted: common.CurrentTimeMillis(),
+		durations:        make(map[string]*common.Distribution),
+		counters:         make(map[string]int64),
+		samples:          make(map[string]*common.Distribution),
 	}
 	log.Println("[STATISTICS] created new lockbased store")
 	return store
 }
 
-func (store *Store) addSample(key string, value int64) {
+func (store *Store) addSample(key string, value float64) {
 	store.addToStore(store.samples, key, value)
 }
 
-func (store *Store) addDuration(key string, value int64) {
+func (store *Store) addDuration(key string, value float64) {
 	store.addToStore(store.durations, key, value)
 }
 
@@ -61,17 +64,18 @@ func (store *Store) addToCounter(key string, value int64) {
 	store.lock.Unlock()
 }
 
-func (store *Store) addToStore(destination map[string]*Distribution, key string, value int64) {
+func (store *Store) addToStore(destination map[string]*common.Distribution, key string, value float64) {
 	store.lock.Lock()
 	distribution, exists := destination[key]
 	if !exists {
-		distribution = NewDistribution()
+		distribution = common.NewDistribution()
 		destination[key] = distribution
 	}
-	distribution.addSample(value)
+	distribution.AddSample(value)
 	store.lock.Unlock()
 }
 
+//Snapshot creates a new snapshot of the current state
 func (store *Store) Snapshot() api.Snapshot {
 	store.lock.Lock()
 	snapshot := store.doGetSnapshot()
@@ -84,14 +88,16 @@ func (store *Store) doGetSnapshot() api.Snapshot {
 	countersCopy := shallowCopy(store.counters)
 	samplesCopy := deepCopy(store.samples)
 
-	return &Snapshot{
-		TimestampCreated:  time.Now().UnixNano() / time.Millisecond.Nanoseconds(),
+	return &common.Snapshot{
+		TimestampStarted:  store.timestampStarted,
+		TimestampCreated:  common.CurrentTimeMillis(),
 		DurationsSnapshot: durationsCopy,
 		CountersSnapshot:  countersCopy,
 		SamplesSnapshot:   samplesCopy,
 	}
 }
 
+// SnapshotAndReset creates a snapshot and clears the recorded counters, durations and samples
 func (store *Store) SnapshotAndReset() api.Snapshot {
 	store.lock.Lock()
 	snapshot := store.doGetSnapshot()
@@ -100,6 +106,7 @@ func (store *Store) SnapshotAndReset() api.Snapshot {
 	return snapshot
 }
 
+// Reset clears the recorded counters, durations and samples
 func (store *Store) Reset() {
 	store.lock.Lock()
 	store.doReset()
@@ -107,18 +114,16 @@ func (store *Store) Reset() {
 }
 
 func (store *Store) doReset() {
-	store.durations = make(map[string]*Distribution)
+	store.timestampStarted = common.CurrentTimeMillis()
+	store.durations = make(map[string]*common.Distribution)
 	store.counters = make(map[string]int64)
-	store.samples = make(map[string]*Distribution)
+	store.samples = make(map[string]*common.Distribution)
 }
 
-func deepCopy(source map[string]*Distribution) map[string]api.Distribution {
+func deepCopy(source map[string]*common.Distribution) map[string]api.Distribution {
 	distMapCopy := make(map[string]api.Distribution)
 	for key, distribution := range source {
 		valueCopy := *distribution // dereference pointer to get a copy of the struct
-		if math.IsNaN(valueCopy.StdDeviation) {
-			valueCopy.StdDeviation = -1.0
-		}
 		distMapCopy[key] = &valueCopy
 	}
 	return distMapCopy

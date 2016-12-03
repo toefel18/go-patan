@@ -15,13 +15,16 @@
  *     limitations under the License.
  *
  */
+
 package channelbased
 
 import (
 	"testing"
 	"github.com/toefel18/go-patan/statistics/api"
 	"time"
+	"github.com/toefel18/go-patan/statistics/common/commontest"
 	"math"
+	"github.com/toefel18/go-patan/statistics/common"
 )
 
 func TestNewFacade(t *testing.T) {
@@ -66,7 +69,7 @@ func TestFacadeHappyFlow(t *testing.T) {
 	// assert expected values
 	var snapshot api.Snapshot
 	snapshot = facade.Snapshot()
-	assertDistributionHasValues(snapshot.Samples()["some.sample"], 1, 10, 10, 10, 0.0, math.NaN(), t)
+	commontest.AssertDistributionHasValues(snapshot.Samples()["some.sample"], 1, 10, 10, 10, 0.0, t)
 	assertDurationWithin(snapshot.Durations()["some.duration"], 1, 100, 100, 100, t, 30)
 	assertCounter(snapshot, "some.counter", 1, t)
 
@@ -80,7 +83,8 @@ func TestFacadeHappyFlow(t *testing.T) {
 
 	// assert expected values
 	snapshot = facade.SnapshotAndReset()
-	assertDistributionHasValues(snapshot.Samples()["some.sample"], 2, 10, 15, 12.5, 0.0, 3.5355339, t)
+	startedTime := common.CurrentTimeMillis()
+	commontest.AssertDistributionHasValues(snapshot.Samples()["some.sample"], 2, 10, 15, 12.5, 3.5355339, t)
 	assertDurationWithin(snapshot.Durations()["some.duration"], 2, 100, 100, 100, t, 30)
 	assertCounter(snapshot, "some.counter", 0, t)
 
@@ -99,9 +103,41 @@ func TestFacadeHappyFlow(t *testing.T) {
 
 	// assert expected values
 	snapshot = facade.Snapshot()
-	assertDistributionHasValues(snapshot.Samples()["some.sample"], 1, 10, 10, 10, 0.0, math.NaN(), t)
+	createdTime := common.CurrentTimeMillis()
+	if !commontest.CloseTo(startedTime, snapshot.StartedTimestamp(), 10) {
+		t.Errorf("snapshot.StartedTimestamp(%v) is not close to expected startTimestamp(%v)", snapshot.StartedTimestamp(), startedTime)
+	}
+	if !commontest.CloseTo(createdTime, snapshot.CreatedTimestamp(), 10) {
+		t.Errorf("snapshot.CreatedTimestamp(%v) is not close to expected createdTime(%v)", snapshot.CreatedTimestamp(), createdTime)
+	}
+	commontest.AssertDistributionHasValues(snapshot.Samples()["some.sample"], 1, 10, 10, 10, 0.0, t)
 	assertDurationWithin(snapshot.Durations()["some.duration"], 1, 100, 100, 100, t, 30)
 	assertCounter(snapshot, "some.counter", 1, t)
+}
+
+// this test is replicated from the distribution and is useful as an integration test.
+func TestDistributionAddSample1To10(t *testing.T) {
+	facade := NewFacade(NewStore())
+	defer facade.Close()
+	for i := 1; i <= 10; i++ {
+		facade.AddSample("sample", float64(i))
+	}
+	expDeviation := math.Sqrt((2*4.5*4.5 + 2*3.5*3.5 + 2*2.5*2.5 + 2*1.5*1.5 + 2*0.5*0.5) / 9)
+	time.Sleep(100 * time.Millisecond)
+	snapshot := facade.Snapshot()
+	commontest.AssertDistributionHasValues(snapshot.Samples()["sample"], 10, 1.0, 10, 5.5, expDeviation, t)
+}
+
+func TestDistributionAddSample10To1(t *testing.T) {
+	facade := NewFacade(NewStore())
+	defer facade.Close()
+	for i := 10; i >= 1; i-- {
+		facade.AddSample("sample", float64(i))
+	}
+	expDeviation := math.Sqrt((2*4.5*4.5 + 2*3.5*3.5 + 2*2.5*2.5 + 2*1.5*1.5 + 2*0.5*0.5) / 9)
+	time.Sleep(100 * time.Millisecond)
+	snapshot := facade.Snapshot()
+	commontest.AssertDistributionHasValues(snapshot.Samples()["sample"], 10, 1.0, 10, 5.5, expDeviation, t)
 }
 
 func assertCounter(snapshot api.Snapshot, key string, value int64, t *testing.T) {
@@ -110,17 +146,17 @@ func assertCounter(snapshot api.Snapshot, key string, value int64, t *testing.T)
 	}
 }
 
-func assertDurationWithin(dist api.Distribution, sampleCount, min, max int64, avg float64, t *testing.T, within int64) {
+func assertDurationWithin(dist api.Distribution, sampleCount int64, min, max, avg float64, t *testing.T, within float64) {
 	if dist.SampleCount() != sampleCount {
 		t.Errorf("expected sample count to be %v but was %v", sampleCount, dist.SampleCount())
 	}
-	if dist.Min() - min > within {
+	if math.Abs(dist.Min() - min) > within {
 		t.Errorf("expected minimum to be +-%v from %v but was %v", within, min, dist.Min())
 	}
-	if dist.Max() != max {
+	if math.Abs(dist.Max() - max) > within {
 		t.Errorf("expected maximum to be +-%v from %v but was %v", within, max, dist.Max())
 	}
-	if dist.Avg() - float64(avg) > float64(within) {
+	if math.Abs(dist.Avg() - float64(avg)) > within {
 		t.Errorf("expected sample average to be +-%v from %v but was %v", within, avg, dist.Avg)
 	}
 	// variance and stddev are tested elsewere

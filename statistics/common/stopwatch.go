@@ -15,24 +15,25 @@
  *     limitations under the License.
  *
  */
-package lockbased
+
+package common
 
 import (
 	"time"
 )
 
+// Stopwatch records how much time has elapsed since it's creation.
 type Stopwatch struct {
 	time.Time
 }
 
-func startNewStopwatch() *Stopwatch {
+// StartNewStopwatch creates a new Stopwatch. Stopwatches start immediatlly once created.
+func StartNewStopwatch() *Stopwatch {
 	return &Stopwatch{time.Now()}
 }
 
-func (sw *Stopwatch) ElapsedMillis() int64 {
-	return sw.ElapsedNanos() / time.Millisecond.Nanoseconds()
-}
-
-func (sw *Stopwatch) ElapsedNanos() int64 {
-	return time.Now().Sub(sw.Time).Nanoseconds()
+// ElapsedMillis contains the milliseconds elapsed since it's creation. The return value is
+// a float, which has nanosecond accuracy.
+func (sw *Stopwatch) ElapsedMillis() float64 {
+	return float64(time.Now().Sub(sw.Time).Nanoseconds()) / float64(time.Millisecond.Nanoseconds())
 }

@@ -25,18 +25,19 @@ import (
 	"testing"
 	"time"
 	"github.com/toefel18/go-patan/statistics/lockbased"
+	"github.com/toefel18/go-patan/statistics/common"
 )
 
 func TestConcurrency(t *testing.T) {
 	Benchmrk(10, 20000)
 	Benchmrk(100, 20000)
-	Benchmrk(1000, 20000)
-	Benchmrk(10, 200000)
-	Benchmrk(100, 200000)
+	Benchmrk(500, 10000)
+	Benchmrk(10, 100000)
+	Benchmrk(100, 100000)
 }
 
 func Benchmrk(threads int64, itemsPerThread int64) {
-	millisStart := currentTimeMillis()
+	millisStart := common.CurrentTimeMillis()
 	wg := sync.WaitGroup{}
 	subject := lockbased.NewFacade(lockbased.NewStore())
 	for i := int64(0); i < threads; i++ {
@@ -47,7 +48,7 @@ func Benchmrk(threads int64, itemsPerThread int64) {
 			defer subject.RecordElapsedTime("goroutine.duration", sw)
 			for i := int64(0); i < itemsPerThread; i++ {
 				subject.IncrementCounter("concurrency.counter")
-				subject.AddSample("concurrency.sample", i)
+				subject.AddSample("concurrency.sample", float64(i))
 			}
 		}()
 	}
@@ -63,12 +64,8 @@ func Benchmrk(threads int64, itemsPerThread int64) {
 	if snapshot.Samples()["concurrency.sample"].SampleCount() != threads * itemsPerThread{
 		panic(fmt.Sprint(expectedItems, "samples expected but got", snapshot.Samples()["concurrency.sample"].SampleCount()))
 	}
-	millisEnd := currentTimeMillis()
+	millisEnd := common.CurrentTimeMillis()
 	fmt.Println(threads, "threads with", itemsPerThread, "items took", (millisEnd - millisStart))
-}
-
-func currentTimeMillis() int64 {
-	return time.Now().UnixNano() / time.Millisecond.Nanoseconds()
 }
 
 func TestEmptyCounters(t *testing.T) {
@@ -98,14 +95,17 @@ func TestJsonize(t *testing.T) {
 	time.Sleep(20 * time.Millisecond)
 	snapshot := Snapshot()
 	json, err := json.Marshal(snapshot)
+	fmt.Println(string(json))
 	if err == nil {
 		jsonString := string(json)
 		if !strings.Contains(jsonString, "json.duration") ||
+			!strings.Contains(jsonString, "timestampStarted") ||
+			!strings.Contains(jsonString, "timestampTaken") ||
 			!strings.Contains(jsonString, "sampleCount") ||
 			!strings.Contains(jsonString, "minimum") ||
 			!strings.Contains(jsonString, "maximum") ||
-			!strings.Contains(jsonString, "average") ||
-			!strings.Contains(jsonString, "standardDeviation") {
+			!strings.Contains(jsonString, "mean") ||
+			!strings.Contains(jsonString, "stdDeviation") {
 			t.Error("the json output does not contain some of the expected values")
 		}
 	} else {

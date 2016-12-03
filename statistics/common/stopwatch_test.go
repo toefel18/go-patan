@@ -15,41 +15,36 @@
  *     limitations under the License.
  *
  */
-package channelbased
+
+package common
 
 import (
-	"fmt"
 	"testing"
 	"time"
+
 	"github.com/toefel18/go-patan/statistics/api"
+	"github.com/toefel18/go-patan/statistics/common/commontest"
 )
 
 func TestStartStopwatch(t *testing.T) {
-	sw := startNewStopwatch()
+	sw := StartNewStopwatch()
 	elapsedMillis := sw.ElapsedMillis()
-	elapsedNanos := sw.ElapsedNanos()
-	if elapsedMillis > 10 {
+	if !commontest.FloatEquals(elapsedMillis, 0) {
 		t.Errorf("newly created stopwatch already has already %v millis elapsed, could indicate programming error", elapsedMillis)
-	} else if elapsedNanos > (10 * time.Millisecond).Nanoseconds() {
-		t.Errorf("newly created stopwatch already has already %v nanos elapsed, could indicate programming error", elapsedNanos)
 	}
 
 	time.Sleep(100 * time.Millisecond)
 
 	elapsedMillis = sw.ElapsedMillis()
-	elapsedNanos = sw.ElapsedNanos()
 
-	if elapsedMillis > 105 || elapsedMillis < 100 {
+	if elapsedMillis > 105.0 || elapsedMillis < 100.0 {
 		t.Errorf("stopwatch elapsed %v millis, expected to be in range 100 to 105 millis", elapsedMillis)
-	} else if elapsedNanos > (105*time.Millisecond).Nanoseconds() || elapsedNanos < (100*time.Millisecond).Nanoseconds() {
-		t.Errorf("stopwatch elapsed %v nanos, expected to be in range 100000000 - 105000000", elapsedNanos)
 	}
-	fmt.Println(elapsedMillis, elapsedNanos)
 }
 
 func TestStopwatchImplementsApiInterface(t *testing.T) {
-	var channelbasedSw *Stopwatch = startNewStopwatch()
-	var apiSw api.Stopwatch = channelbasedSw
+	sw := StartNewStopwatch()
+	var apiSw api.Stopwatch = sw
 	if apiSw.ElapsedMillis() > 100 {
 		t.Error("channelbased.Stopwatch has problems implementing api.Stopwatch")
 	}

@@ -18,22 +18,21 @@
 package api
 
 type Stopwatch interface {
-	ElapsedMillis() int64
-	ElapsedNanos() int64
+	ElapsedMillis() float64
 }
 
-// Models a statistical distribution
+// Models a statistical distribution this interface is not json.Marshalled, it's the underlying type, see common.distribution
 type Distribution interface {
 	SampleCount() int64
-	Min() int64
-	Max() int64
+	Min() float64
+	Max() float64
 	Avg() float64
-	Variance() float64
 	StdDev() float64
 }
 
 type Snapshot interface {
-	TimestampTaken() int64
+	CreatedTimestamp() int64
+	StartedTimestamp() int64
 	Durations() map[string]Distribution
 	Counters() map[string]int64
 	Samples() map[string]Distribution
@@ -44,11 +43,11 @@ type Facade interface {
 
 	// Records the elapsed time of the stopwatch and adds that to the distribution identified by key.
 	// Returns the recorded millis
-	RecordElapsedTime(key string, stopwatch Stopwatch) int64
+	RecordElapsedTime(key string, stopwatch Stopwatch) float64
 
 	// Records duration of the subject function and adds that to the distribution identified by key.
 	// Returns the recorded millis
-	MeasureFunc(key string, subject func()) int64
+	MeasureFunc(key string, subject func()) float64
 
 	// Increments the counter identified with key by 1. If the counter does not yet exist, it will be created
 	// with initial value of 1
@@ -63,7 +62,7 @@ type Facade interface {
 	AddToCounter(key string, value int64)
 
 	// Adds a value to the sample distribution identified by key. If the distribution does not yet exist, value will be it's initial value.
-	AddSample(key string, value int64)
+	AddSample(key string, value float64)
 
 	// Clears all durations, counters and samples
 	Reset()

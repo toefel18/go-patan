@@ -15,29 +15,41 @@
  *     limitations under the License.
  *
  */
-package channelbased
+
+package common
 
 import "github.com/toefel18/go-patan/statistics/api"
 
+// Snapshot contains a copy of all the measurements recorded between TimestampStarted and TimestampCreated
 type Snapshot struct {
+	TimestampStarted  int64                       `json:"timestampStarted"`
 	TimestampCreated  int64                       `json:"timestampTaken"`
 	DurationsSnapshot map[string]api.Distribution `json:"durations"`
 	CountersSnapshot  map[string]int64            `json:"counters"`
 	SamplesSnapshot   map[string]api.Distribution `json:"samples"`
 }
 
-func (sh *Snapshot) TimestampTaken() int64 {
+// CreatedTimestamp returns the timestamp (millis since epoch) on which the snapshot was created
+func (sh *Snapshot) CreatedTimestamp() int64 {
 	return sh.TimestampCreated
 }
 
+// StartedTimestamp returns the timestamp (millis since epoch) on which recordings started
+func (sh *Snapshot) StartedTimestamp() int64 {
+	return sh.TimestampStarted
+}
+
+// Durations returns the map of recorded durations
 func (sh *Snapshot) Durations() map[string]api.Distribution {
 	return sh.DurationsSnapshot
 }
 
+// Counters returns the map of recorded counters
 func (sh *Snapshot) Counters() map[string]int64 {
 	return sh.CountersSnapshot
 }
 
+//Samples returns the map of recorded Samples
 func (sh *Snapshot) Samples() map[string]api.Distribution {
 	return sh.SamplesSnapshot
 }
