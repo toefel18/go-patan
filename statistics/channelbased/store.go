@@ -19,9 +19,9 @@
 package channelbased
 
 import (
-	"log"
 	"github.com/toefel18/go-patan/statistics/api"
 	"github.com/toefel18/go-patan/statistics/common"
+	"log"
 )
 
 // NewMeasurement contains one new measurement to process
