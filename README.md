@@ -1,5 +1,7 @@
 # ![patan-logo](go-patan.png)-patan a small library for gathering statistics.
 
+[![Build Status](https://travis-ci.org/toefel18/go-patan.svg?branch=master)](https://travis-ci.org/toefel18/go-patan) [![codecov.io](https://codecov.io/github/toefel18/go-patan/coverage.svg?branch=master "coverage")](https://codecov.io/github/toefel18/go-patan)
+
 Golang port of the java sampling library [patan](https://github.com/toefel18/patan) that provides: 
   - counters; keeping track of how many times *something* has taken place
   - sampling; collecting samples and describing their distribution
@@ -8,6 +10,11 @@ Golang port of the java sampling library [patan](https://github.com/toefel18/pat
 The API is not identical to the java version, some methods are named differently. 
 
 When serializing a snapshot to JSON, it should produce the same output as the java version.
+
+Start with:
+```
+go get github.com/toefel18/go-patan
+```
   
 Usage:
 ```go
