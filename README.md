@@ -89,24 +89,5 @@ The output will be:
 }
 ```
 
-The default statistics instance, which is always and directly available when using patan (see code example, `statistics`
-is the default available instance) uses a lock-based implementation. For more info on implementations, read on.
-
-## API implementations
-There are two implementations, one based on channels and another based on locks. Micro benchmarks
-were in favor of the lock-based implementation and it also shows direct consistency whereas the
-channel-based implementation is eventual consistent.
-
-#### Lock-based  implementation
-The implementation is direct consistent.
-
-#### Channel-based  implementation (DEPRECATED)
-This implementation is eventual consitent and the invocation order does not necessarily reflect the
-processing order! Users should not depend on that. Consider the example code above when it would
-use a channel-based implementation:
-
-It is possible (and even likely) that snapshot does not have my.heavy.operation yet, meaning that
-B is executed earlier than A! This differs from the java version of Patan and is a consequence
-of the non-blocking setup with channels. This is OK because patan is meant to give insight in
-the distribution of data over a longer period of time, not for individual measurements.
-git
+`statistics` is the default statistics instance, which is always and directly available when using patan. See code example, `statistics`
+is the default available instance.
