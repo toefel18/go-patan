@@ -7,7 +7,7 @@ go:
   - tip
 
 script:
- - ./travis-test-script.sh
+  - ./travis-test-script.sh
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
