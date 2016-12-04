@@ -22,7 +22,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/toefel18/go-patan/statistics/api"
+	"github.com/toefel18/go-patan/metrics/api"
 )
 
 //AssertDistributionHasValues checks if the distribution contains the expected values

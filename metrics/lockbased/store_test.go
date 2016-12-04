@@ -22,9 +22,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/toefel18/go-patan/statistics/api"
-	"github.com/toefel18/go-patan/statistics/common"
-	"github.com/toefel18/go-patan/statistics/common/commontest"
+	"github.com/toefel18/go-patan/metrics/api"
+	"github.com/toefel18/go-patan/metrics/common"
+	"github.com/toefel18/go-patan/metrics/common/commontest"
 )
 
 const (

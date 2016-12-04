@@ -1,4 +1,4 @@
-# ![patan-logo](go-patan.png)-patan a small library for gathering statistics.
+# ![patan-logo](go-patan.png)-patan a small library for gathering metrics.
 
 [![Build Status](https://travis-ci.org/toefel18/go-patan.svg?branch=master)](https://travis-ci.org/toefel18/go-patan) [![codecov.io](https://codecov.io/github/toefel18/go-patan/coverage.svg?branch=master "coverage")](https://codecov.io/github/toefel18/go-patan) [![Go Report Card](https://goreportcard.com/badge/github.com/toefel18/go-patan)](https://goreportcard.com/report/github.com/toefel18/go-patan)
 
@@ -21,24 +21,24 @@ Usage:
 package main
 
 import (
-    "github.com/toefel18/go-patan/statistics"
+    "github.com/toefel18/go-patan/metrics"
     "time"
     "fmt"
     "encoding/json"
 )
 
 func main() {
-    stopwatch := statistics.StartStopwatch()
+    stopwatch := metrics.StartStopwatch()
     time.Sleep(2 * time.Second)
 
-    statistics.AddSample("mem.allocations", 167.0334)
-    statistics.AddSample("mem.allocations", 111.9216)
-    statistics.AddSample("mem.allocations", 133.4686)
-    statistics.AddSample("mem.collects", 2)
-    statistics.AddToCounter("active.sessions", 132)
-    statistics.DecrementCounter("active.sessions")
-    statistics.RecordElapsedTime("my.heavy.operation", stopwatch)   // A
-    snapshot := statistics.Snapshot()                               // B
+    metrics.AddSample("mem.allocations", 167.0334)
+    metrics.AddSample("mem.allocations", 111.9216)
+    metrics.AddSample("mem.allocations", 133.4686)
+    metrics.AddSample("mem.collects", 2)
+    metrics.AddToCounter("active.sessions", 132)
+    metrics.DecrementCounter("active.sessions")
+    metrics.RecordElapsedTime("my.heavy.operation", stopwatch)   // A
+    snapshot := metrics.Snapshot()                               // B
 
     duration, exists := snapshot.Durations()["my.heavy.operation"]
     if exists {
@@ -89,5 +89,5 @@ The output will be:
 }
 ```
 
-`statistics` is the default statistics instance, which is always and directly available when using patan. See code example, `statistics`
+`metrics` is the default metrics instance, which is always and directly available when using patan. See code example, `metrics`
 is the default available instance.

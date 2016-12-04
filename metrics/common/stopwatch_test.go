@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/toefel18/go-patan/statistics/api"
+	"github.com/toefel18/go-patan/metrics/api"
 )
 
 func TestStartStopwatch(t *testing.T) {

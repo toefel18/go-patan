@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package statistics
+package metrics
 
 import (
 	"encoding/json"
@@ -25,8 +25,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/toefel18/go-patan/statistics/common"
-	"github.com/toefel18/go-patan/statistics/lockbased"
+	"github.com/toefel18/go-patan/metrics/common"
+	"github.com/toefel18/go-patan/metrics/lockbased"
 )
 
 func TestConcurrency(t *testing.T) {
