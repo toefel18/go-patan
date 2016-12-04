@@ -33,7 +33,6 @@ func TestNewFacade(t *testing.T) {
 	if facade == nil {
 		t.Error("NewFacade returned nil")
 	}
-	facade.Close()
 }
 
 func TestNewFacadeWithNilStore(t *testing.T) {
@@ -48,7 +47,6 @@ func TestNewFacadeWithNilStore(t *testing.T) {
 
 func TestFacadeImplementsApiInterface(t *testing.T) {
 	var facade = NewFacade(NewStore())
-	defer facade.Close()
 	var apiFacade api.Facade = facade
 	if apiFacade.StartStopwatch() == nil {
 		t.Error("lockbased.Facade has problems implementing the api.Facade")
@@ -57,7 +55,11 @@ func TestFacadeImplementsApiInterface(t *testing.T) {
 
 func TestFacadeHappyFlow(t *testing.T) {
 	facade := NewFacade(NewStore())
-	defer facade.Close()
+
+	//add a sample and reset
+	facade.AddSample("some.sample", 10)
+	facade.Reset()
+
 	// add some test data
 	facade.AddSample("some.sample", 10)
 	facade.MeasureFunc("some.duration", func() { time.Sleep(100 * time.Millisecond) })
@@ -110,7 +112,6 @@ func TestFacadeHappyFlow(t *testing.T) {
 // this test is replicated from the distribution and is useful as an integration test.
 func TestDistributionAddSample1To10(t *testing.T) {
 	facade := NewFacade(NewStore())
-	defer facade.Close()
 	for i := 1; i <= 10; i++ {
 		facade.AddSample("sample", float64(i))
 	}
@@ -122,7 +123,6 @@ func TestDistributionAddSample1To10(t *testing.T) {
 
 func TestDistributionAddSample10To1(t *testing.T) {
 	facade := NewFacade(NewStore())
-	defer facade.Close()
 	for i := 10; i >= 1; i-- {
 		facade.AddSample("sample", float64(i))
 	}

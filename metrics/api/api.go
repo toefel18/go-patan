@@ -78,7 +78,4 @@ type Facade interface {
 	// Creates a snapshot and then calls Reset()
 	// Also, see documentation above
 	SnapshotAndReset() Snapshot
-
-	// Free up resources
-	Close()
 }

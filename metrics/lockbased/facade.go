@@ -92,8 +92,3 @@ func (facade *Facade) Snapshot() api.Snapshot {
 func (facade *Facade) SnapshotAndReset() api.Snapshot {
 	return facade.store.SnapshotAndReset()
 }
-
-// Close closes the underlying store
-func (facade *Facade) Close() {
-	// nop, the internal store has no resources to clean-up
-}

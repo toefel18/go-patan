@@ -38,7 +38,6 @@ type Store struct {
 }
 
 // NewStore creates a new store and starts a go-routine that listens for requests on the channels.
-// Don't forget to call store.Close() when throwing away the store!
 func NewStore() *Store {
 	store := &Store{
 		timestampStarted: common.CurrentTimeMillis(),

@@ -94,8 +94,3 @@ func Snapshot() api.Snapshot {
 func SnapshotAndReset() api.Snapshot {
 	return std.SnapshotAndReset()
 }
-
-// Close closes the underlying store
-func Close() {
-	std.Close()
-}

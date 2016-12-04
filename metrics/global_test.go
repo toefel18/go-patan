@@ -37,6 +37,39 @@ func TestConcurrency(t *testing.T) {
 	Benchmrk(100, 50000)
 }
 
+func TestHapppyFlow(t *testing.T) {
+	Reset()
+	RecordElapsedTime("record.elapsed.time", StartStopwatch())
+	MeasureFunc("measure.func", func() {
+		time.Sleep(200 * time.Millisecond)
+	})
+	IncrementCounter("inc")
+	DecrementCounter("dec")
+	AddToCounter("add.to.counter", 9541)
+	AddSample("sample", 5.0)
+	AddSample("sample", 10.0)
+	ss := Snapshot()
+	if len(ss.Counters()) != 3 {
+		t.Error("expected 3 counters but got ", len(ss.Counters()))
+	}
+	if len(ss.Durations()) != 2 {
+		t.Error("expected 2 durations but got ", len(ss.Durations()))
+	}
+	if len(ss.Samples()) != 1 {
+		t.Error("expected 2 durations but got ", len(ss.Samples()))
+	}
+	xx := SnapshotAndReset()
+	if len(xx.Counters()) == 0 || len(xx.Durations()) == 0 || len(ss.Samples()) == 0 {
+		result, _ := json.Marshal(ss)
+		t.Error("SnapshotAndReset should return the latest data inside the repository, but some items appear cleared state: " + string(result))
+	}
+	ss = Snapshot() // this snapshot should be cleared
+	if len(ss.Counters())+len(ss.Durations())+len(ss.Samples()) != 0 {
+		result, _ := json.Marshal(ss)
+		t.Error("Snapshot after SnapshotAndReset() should be empty, but got: " + string(result))
+	}
+}
+
 func Benchmrk(threads int64, itemsPerThread int64) {
 	millisStart := common.CurrentTimeMillis()
 	wg := sync.WaitGroup{}
@@ -96,7 +129,6 @@ func TestJsonize(t *testing.T) {
 	time.Sleep(20 * time.Millisecond)
 	snapshot := Snapshot()
 	json, err := json.Marshal(snapshot)
-	fmt.Println(string(json))
 	if err == nil {
 		jsonString := string(json)
 		if !strings.Contains(jsonString, "json.duration") ||
