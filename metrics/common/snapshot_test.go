@@ -41,7 +41,6 @@ func TestSnapshot(t *testing.T) {
 	if snapshot.CreatedTimestamp() != 20000 {
 		t.Errorf("Started Timestamp = %v, expected %v", snapshot.CreatedTimestamp(), 20000)
 	}
-
 	if !reflect.DeepEqual(snapshot.Durations(), durations) {
 		t.Error("Durations returns a different instance than expected")
 	}
