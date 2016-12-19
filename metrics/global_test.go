@@ -30,11 +30,11 @@ import (
 )
 
 func TestConcurrency(t *testing.T) {
-	Benchmrk(10, 20000)
-	Benchmrk(100, 20000)
-	Benchmrk(500, 10000)
-	Benchmrk(10, 50000)
-	Benchmrk(100, 50000)
+	runConcurrencyTest(10, 20000)
+	runConcurrencyTest(100, 20000)
+	runConcurrencyTest(500, 10000)
+	runConcurrencyTest(10, 50000)
+	runConcurrencyTest(100, 50000)
 }
 
 func TestHapppyFlow(t *testing.T) {
@@ -70,7 +70,64 @@ func TestHapppyFlow(t *testing.T) {
 	}
 }
 
-func Benchmrk(threads int64, itemsPerThread int64) {
+func BenchmarkTimer(b *testing.B) {
+	timer := StartStopwatch()
+	for i := 0; i < b.N; i++ {
+		RecordElapsedTime("some.duration", timer)
+	}
+}
+
+func BenchmarkAddToCounter(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		AddToCounter("some.counter", int64(i))
+	}
+}
+
+func BenchmarkIncrementCounter(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		IncrementCounter("some.counter")
+	}
+}
+
+func BenchmarkDecrementCounter(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		DecrementCounter("some.counter")
+	}
+}
+
+func BenchmarkSample(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		AddSample("some.sample", float64(i))
+	}
+}
+
+func BenchmarkAll(b *testing.B) {
+	timer := StartStopwatch()
+	for i := 0; i < b.N; i++ {
+		MeasureFunc("some.func", func () {
+			DecrementCounter("some.counter")
+			RecordElapsedTime("some.duration", timer)
+			AddSample("some.sample", float64(i))
+			IncrementCounter("some.counter")
+		})
+	}
+}
+
+func BenchmarkAllParallel(b *testing.B) {
+	timer := StartStopwatch()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			MeasureFunc("some.func", func () {
+				DecrementCounter("some.counter")
+				RecordElapsedTime("some.duration", timer)
+				AddSample("some.sample", 333.333)
+				IncrementCounter("some.counter")
+			})
+		}
+	})
+}
+
+func runConcurrencyTest(threads int64, itemsPerThread int64) {
 	millisStart := common.CurrentTimeMillis()
 	wg := sync.WaitGroup{}
 	subject := lockbased.NewFacade(lockbased.NewStore())
