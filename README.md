@@ -37,8 +37,8 @@ func main() {
     metrics.AddSample("mem.collects", 2)
     metrics.AddToCounter("active.sessions", 132)
     metrics.DecrementCounter("active.sessions")
-    metrics.RecordElapsedTime("my.heavy.operation", stopwatch)   // A
-    snapshot := metrics.Snapshot()                               // B
+    metrics.RecordElapsedTime("my.heavy.operation", stopwatch)   
+    snapshot := metrics.Snapshot()                               
 
     duration, exists := snapshot.Durations()["my.heavy.operation"]
     if exists {
