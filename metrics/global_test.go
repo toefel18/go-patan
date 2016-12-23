@@ -83,6 +83,22 @@ func BenchmarkAddToCounter(b *testing.B) {
 	}
 }
 
+func BenchmarkMeasureFuncCanPanic(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		MeasureFuncCanPanic("some.func", func() {
+			return
+		})
+	}
+}
+
+func BenchmarkMeasureFunc(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		MeasureFunc("some.func", func() {
+			return
+		})
+	}
+}
+
 func BenchmarkIncrementCounter(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		IncrementCounter("some.counter")

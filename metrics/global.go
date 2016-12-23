@@ -39,6 +39,11 @@ func init() {
 	log.Println("[METRICS] global version of patan initialized")
 }
 
+// New returns a new API facade with a new and empty underlying store.
+func New() api.Facade {
+	return lockbased.NewFacade(lockbased.NewStore())
+}
+
 // The methods below are equal to those of api.Facade and operate on the
 // global instance of api.Facade that is ready to use
 
@@ -55,6 +60,13 @@ func RecordElapsedTime(key string, stopwatch api.Stopwatch) float64 {
 // MeasureFunc runs the subject function and records it's execution duration under the distribution identified with key
 func MeasureFunc(key string, subject func()) float64 {
 	return std.MeasureFunc(key, subject)
+}
+
+// MeasureFuncCanPanic runs the subject function and records it's execution duration under the distribution identified
+// with key. When subject() panics, the measurement is recored under the same key with .panic appended. This function
+// itself will panic with the same error as the inner function.
+func MeasureFuncCanPanic(key string, subject func()) float64 {
+	return std.MeasureFuncCanPanic(key, subject)
 }
 
 // IncrementCounter increments the counter identified by key by 1

@@ -54,6 +54,11 @@ type Facade interface {
 	// Returns the recorded millis
 	MeasureFunc(key string, subject func()) float64
 
+	// MeasureFuncCanPanic runs the subject function and records it's execution duration under the distribution identified
+	// with key. When subject() panics, the measurement is recorded under the same key with .panic appended. This function
+	// itself will panic with the same error as the inner function.
+	MeasureFuncCanPanic(key string, subject func()) float64
+
 	// Increments the counter identified with key by 1. If the counter does not yet exist, it will be created
 	// with initial value of 1
 	IncrementCounter(key string)

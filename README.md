@@ -89,5 +89,39 @@ The output will be:
 }
 ```
 
-`metrics` is the default metrics instance, which is always and directly available when using patan. See code example, `metrics`
-is the default available instance.
+`metrics` is the default metrics instance, which is always and directly available when using patan. It's also possible to create multiple
+instances of `metrics`, which could be useful to separate detailed and global measurements or public/private measurements. 
+
+```go
+package main
+
+import (
+    "github.com/toefel18/go-patan/metrics"
+    "net/http"
+    "fmt"
+    "html"
+)
+
+func main() {
+    apiMetrics := metrics.New()
+    dbMetrics := metrics.New()
+    
+    http.HandleFunc("/music/songs", func(w http.ResponseWriter, r *http.Request) {
+        apiMetrics.MeasureFunc("api.music.songs", func () {
+    	    fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+        })
+    })
+    
+    // or
+    http.HandleFunc("/music/albums", func(w http.ResponseWriter, r *http.Request) {
+        stopwatch := metrics.StartStopwatch()
+        
+        data := "some database operation"
+        dbMetrics.RecordElapsedTime("db.music.albums", stopwatch)   // stopwatch is not bound to a specific instance!
+                    
+    	fmt.Fprintf(w, "Hello, %q " + data, html.EscapeString(r.URL.Path))    	
+    	apiMetrics.RecordElapsedTime("api.music.albums", stopwatch)
+    })  
+}
+
+```

@@ -49,8 +49,24 @@ func (facade *Facade) RecordElapsedTime(key string, stopwatch api.Stopwatch) flo
 }
 
 // MeasureFunc runs the subject function and records it's execution duration under the distribution identified with key
+// if the function panics, no measurement is recorded! Use MeasureFuncCanPanic to get a function that can panic
 func (facade *Facade) MeasureFunc(key string, subject func()) float64 {
 	sw := common.StartNewStopwatch()
+	subject()
+	return facade.RecordElapsedTime(key, sw)
+}
+
+// MeasureFuncCanPanic runs the subject function and records it's execution duration under the distribution identified
+// with key. When subject() panics, the measurement is recorded under the same key with .panic appended. This function
+// itself will panic with the same error as the inner function.
+func (facade *Facade) MeasureFuncCanPanic(key string, subject func()) float64 {
+	sw := common.StartNewStopwatch()
+	defer func() {
+		if err := recover(); err != nil {
+			facade.RecordElapsedTime(key + ".panic", sw)
+			panic(err)
+		}
+	}()
 	subject()
 	return facade.RecordElapsedTime(key, sw)
 }
