@@ -29,6 +29,34 @@ import (
 	"github.com/toefel18/go-patan/metrics/lockbased"
 )
 
+func Example() {
+	sw := StartStopwatch()
+
+	IncrementCounter("active.connections")
+	AddSample("shopping.basket.total", 143.26)
+	AddSample("shopping.basket.total", 167.16)
+	AddSample("shopping.basket.total", 23.98)
+	DecrementCounter("active.connections")
+	RecordElapsedTime("order.processing.duration", sw)
+
+	snapshot := SnapshotAndReset() //Returns a snapshot of all recorded counters, samples and durations and clears the store!
+
+	_ = snapshot.Counters()["active.connections"] // 0    (1 increment, 1 decrement, counters start at 0)
+
+	basketTotal := snapshot.Samples()["shopping.basket.total"] // baskedTotal = a distribution with a min, max, avg and stddev
+	basketTotal.SampleCount()                                  // 3
+	basketTotal.Avg()                                          // 111,46
+	basketTotal.StdDev()                                       // ...
+
+	processingDuration := snapshot.Durations()["order.processing.duration"] //  returns a distribution as well
+	processingDuration.SampleCount()                                        // 1
+	processingDuration.Avg()                                                // ...
+	//...
+
+	timeWindow := snapshot.CreatedTimestamp() - snapshot.StartedTimestamp() // time window in which measurements were recorded in millis
+	_ = timeWindow
+}
+
 func TestConcurrency(t *testing.T) {
 	runConcurrencyTest(10, 20000)
 	runConcurrencyTest(100, 20000)
@@ -120,7 +148,7 @@ func BenchmarkSample(b *testing.B) {
 func BenchmarkAll(b *testing.B) {
 	timer := StartStopwatch()
 	for i := 0; i < b.N; i++ {
-		MeasureFunc("some.func", func () {
+		MeasureFunc("some.func", func() {
 			DecrementCounter("some.counter")
 			RecordElapsedTime("some.duration", timer)
 			AddSample("some.sample", float64(i))
@@ -133,7 +161,7 @@ func BenchmarkAllParallel(b *testing.B) {
 	timer := StartStopwatch()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
-			MeasureFunc("some.func", func () {
+			MeasureFunc("some.func", func() {
 				DecrementCounter("some.counter")
 				RecordElapsedTime("some.duration", timer)
 				AddSample("some.sample", 333.333)
