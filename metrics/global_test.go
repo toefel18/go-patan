@@ -71,16 +71,27 @@ func TestHapppyFlow(t *testing.T) {
 	MeasureFunc("measure.func", func() {
 		time.Sleep(200 * time.Millisecond)
 	})
+	MeasureFuncCanPanic("measure.func.safe", func() {
+		time.Sleep(200 * time.Millisecond)
+	})
+	otherUnused := New()
 	IncrementCounter("inc")
 	DecrementCounter("dec")
 	AddToCounter("add.to.counter", 9541)
 	AddSample("sample", 5.0)
+
+	ssNew := otherUnused.SnapshotAndReset() // SHOULD DO NOTHING, otherUnused is unrelated
+	if len(ssNew.Counters())+len(ssNew.Durations())+len(ssNew.Samples()) != 0 {
+		t.Error("an unrelated instance should not affect the global instance")
+	}
+
 	AddSample("sample", 10.0)
+
 	ss := Snapshot()
 	if len(ss.Counters()) != 3 {
 		t.Error("expected 3 counters but got ", len(ss.Counters()))
 	}
-	if len(ss.Durations()) != 2 {
+	if len(ss.Durations()) != 3 {
 		t.Error("expected 2 durations but got ", len(ss.Durations()))
 	}
 	if len(ss.Samples()) != 1 {
@@ -96,6 +107,7 @@ func TestHapppyFlow(t *testing.T) {
 		result, _ := json.Marshal(ss)
 		t.Error("Snapshot after SnapshotAndReset() should be empty, but got: " + string(result))
 	}
+
 }
 
 func BenchmarkTimer(b *testing.B) {

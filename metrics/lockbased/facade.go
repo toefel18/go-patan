@@ -63,7 +63,7 @@ func (facade *Facade) MeasureFuncCanPanic(key string, subject func()) float64 {
 	sw := common.StartNewStopwatch()
 	defer func() {
 		if err := recover(); err != nil {
-			facade.RecordElapsedTime(key + ".panic", sw)
+			facade.RecordElapsedTime(key+".panic", sw)
 			panic(err)
 		}
 	}()

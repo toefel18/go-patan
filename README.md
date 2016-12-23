@@ -13,7 +13,7 @@ When serializing a snapshot to JSON, it should produce the same output as the ja
 
 Start with:
 ```
-    go get gopkg.in/toefel18/go-patan.v1
+    go get gopkg.in/toefel18/go-patan.v1/metrics
 ```
 
 Documentation: 

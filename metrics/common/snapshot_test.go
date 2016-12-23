@@ -19,9 +19,9 @@
 package common
 
 import (
-	"testing"
 	"github.com/toefel18/go-patan/metrics/api"
 	"reflect"
+	"testing"
 )
 
 func TestSnapshot(t *testing.T) {
@@ -47,7 +47,7 @@ func TestSnapshot(t *testing.T) {
 	if !reflect.DeepEqual(snapshot.Samples(), durations) {
 		t.Error("Samples returns a different instance than expected")
 	}
-	if !reflect.DeepEqual(snapshot.Counters(), counters){
+	if !reflect.DeepEqual(snapshot.Counters(), counters) {
 		t.Error("Counters returns a different instance than expected")
 	}
 }

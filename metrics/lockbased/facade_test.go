@@ -109,10 +109,9 @@ func TestFacadeHappyFlow(t *testing.T) {
 	assertCounter(snapshot, "some.counter", 1, t)
 }
 
-
 func TestFacade_MeasureFuncCanPanic(t *testing.T) {
 	facade := NewFacade(NewStore())
-	defer func () {
+	defer func() {
 		if err := recover(); err != nil {
 			if str, ok := err.(string); ok {
 				if str != "taking too long" {
@@ -130,7 +129,6 @@ func TestFacade_MeasureFuncCanPanic(t *testing.T) {
 		panic("taking too long")
 	})
 }
-
 
 // this test is replicated from the distribution and is useful as an integration test.
 func TestDistributionAddSample1To10(t *testing.T) {
