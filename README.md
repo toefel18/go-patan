@@ -16,6 +16,9 @@ Start with:
     go get gopkg.in/toefel18/go-patan.v1
 ```
 
+Documentation: 
+[godoc.org/github.com/toefel18/go-patan/metrics](https://godoc.org/github.com/toefel18/go-patan/metrics)
+
 Usage:
 ```go
 package main
